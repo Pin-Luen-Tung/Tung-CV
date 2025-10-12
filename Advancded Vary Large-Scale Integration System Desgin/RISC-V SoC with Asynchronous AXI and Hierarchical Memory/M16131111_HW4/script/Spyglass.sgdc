@@ -1,0 +1,337 @@
+current_design "top"
+
+# define your clock
+clock -name "top.cpu_clk"     -domain cpu_clk     -tag cpu_clk    -period 1.0  -edge {0 0.5}
+clock -name "top.axi_clk"     -domain axi_clk     -tag axi_clk    -period 2.5  -edge {0 1.25}
+clock -name "top.dram_clk"    -domain dram_clk    -tag dram_clk   -period 5.0  -edge {0 2.5}
+clock -name "top.rom_clk"     -domain rom_clk     -tag rom_clk    -period 50.1  -edge {0 25.05}
+
+reset -name "cpu_rst"  -value 1 -async
+reset -name "axi_rst"  -value 1 -async
+reset -name "rom_rst"  -value 1 -async
+reset -name "dram_rst"  -value 1 -async
+
+abstract_port -module TS1N16ADFPCLLLVTA128X64M4SWSHOD_data_array -ports  SLP DSLP SD PUDELAY CEB WEB A D BWEB RTSEL WTSEL Q -clock cpu_clk
+abstract_port -module TS1N16ADFPCLLLVTA128X64M4SWSHOD_tag_array -ports  SLP DSLP SD PUDELAY CEB WEB A D BWEB RTSEL WTSEL Q -clock cpu_clk
+abstract_port -module TS1N16ADFPCLLLVTA512X45M4SWSHOD -ports  SLP DSLP SD PUDELAY CEB WEB A D BWEB RTSEL WTSEL Q  -clock cpu_clk
+
+# ---------------- reset register to 0 ---------------- # 
+# ---------------- WTO_cdc ---------------- #
+define_tag -tag initState -name top.WTO_r 	            -value 0
+define_tag -tag initState -name top.WTO_flip_flop2	    -value 0
+
+# ---------------- axi_m0_cdc ---------------- #
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.aw_fifo_m2a.rptr_gray_r 	            -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.aw_fifo_m2a.rptr_flipflop2 	        -value 0
+# AR 
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.aw_fifo_m2a.rptr_gray_r 	            -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.aw_fifo_m2a.rptr_flipflop2 	        -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.aw_fifo_m2a.wptr_gray_r	            -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.aw_fifo_m2a.wptr_flipflop2 	        -value 0
+
+# R
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.r_fifo_a2m.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.r_fifo_a2m.rptr_flipflop2	        -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.r_fifo_a2m.wptr_gray_r	            -value 0
+define_tag -tag initState -name top.BUS.M0_CDC_INTERFACE.r_fifo_a2m.wptr_flipflop2 	        -value 0
+
+
+
+
+
+# ---------------- axi_m1_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.aw_fifo_m2a.rptr_gray_r	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.aw_fifo_m2a.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.aw_fifo_m2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.aw_fifo_m2a.wptr_flipflop2 	-value 0
+
+
+# W
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.w_fifo_m2s.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.w_fifo_m2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.w_fifo_m2s.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.w_fifo_m2s.wptr_flipflop2 	    -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.ar_fifo_m2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.ar_fifo_m2a.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.ar_fifo_m2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.ar_fifo_m2a.wptr_flipflop2 	-value 0
+											 
+# R
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.r_fifo_a2m.rptr_gray_r 	-value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.r_fifo_a2m.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.r_fifo_a2m.wptr_gray_r 	-value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.r_fifo_a2m.wptr_flipflop2 	-value 0
+
+# B
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.B_a2m.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.B_a2m.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.B_a2m.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M1_CDC_INTERFACE.B_a2m.wptr_flipflop2 	-value 0
+
+
+# ---------------- axi_m2_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.aw_fifo_m2a.rptr_gray_r	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.aw_fifo_m2a.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.aw_fifo_m2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.aw_fifo_m2a.wptr_flipflop2 	-value 0
+
+
+# W
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.w_fifo_m2s.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.w_fifo_m2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.w_fifo_m2s.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.w_fifo_m2s.wptr_flipflop2 	    -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.ar_fifo_m2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.ar_fifo_m2a.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.ar_fifo_m2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.ar_fifo_m2a.wptr_flipflop2 	-value 0
+											 
+# R
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.r_fifo_a2m.rptr_gray_r 	-value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.r_fifo_a2m.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.r_fifo_a2m.wptr_gray_r 	-value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.r_fifo_a2m.wptr_flipflop2 	-value 0
+
+# B
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.B_a2m.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.B_a2m.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.B_a2m.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.M2_CDC_INTERFACE.B_a2m.wptr_flipflop2 	-value 0
+
+
+# ---------------- axi_s0_cdc ---------------- #
+
+# AR 
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.ar_fifo_a2s.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.ar_fifo_a2s.rptr_flipflop2 	-value 0
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.ar_fifo_a2s.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.ar_fifo_a2s.wptr_flipflop2 	-value 0
+
+# R
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.r_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.r_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.r_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S0_INTERFACE_CDC.r_fifo_s2a.wptr_flipflop2 	    -value 0
+
+
+
+# ---------------- axi_s1_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.aw_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.aw_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.aw_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.aw_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# W
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.w_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.w_fifo_a2s.rptr_flipflop2 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.w_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.w_fifo_a2s.wptr_flipflop2 	        -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.ar_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.ar_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.ar_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.ar_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# R
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.r_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.r_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.r_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.r_fifo_s2a.wptr_flipflop2 	    -value 0
+
+# B
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.b_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.b_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.b_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S1_INTERFACE_CDC.b_fifo_s2a.wptr_flipflop2 	    -value 0
+
+
+# ---------------- axi_s2_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.aw_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.aw_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.aw_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.aw_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# W
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.w_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.w_fifo_a2s.rptr_flipflop2 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.w_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.w_fifo_a2s.wptr_flipflop2 	        -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.ar_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.ar_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.ar_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.ar_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# R
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.r_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.r_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.r_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.r_fifo_s2a.wptr_flipflop2 	    -value 0
+
+# B
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.b_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.b_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.b_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S2_INTERFACE_CDC.b_fifo_s2a.wptr_flipflop2 	    -value 0
+
+
+# ---------------- axi_s3_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.aw_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.aw_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.aw_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.aw_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# W
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.w_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.w_fifo_a2s.rptr_flipflop2 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.w_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.w_fifo_a2s.wptr_flipflop2 	        -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.ar_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.ar_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.ar_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.ar_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# R
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.r_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.r_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.r_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.r_fifo_s2a.wptr_flipflop2 	    -value 0
+
+# B
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.b_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.b_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.b_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S3_INTERFACE_CDC.b_fifo_s2a.wptr_flipflop2 	    -value 0
+
+
+
+
+
+# ---------------- axi_s4_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.aw_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.aw_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.aw_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.aw_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# W
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.w_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.w_fifo_a2s.rptr_flipflop2 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.w_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.w_fifo_a2s.wptr_flipflop2 	        -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.ar_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.ar_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.ar_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.ar_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# R
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.r_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.r_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.r_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.r_fifo_s2a.wptr_flipflop2 	    -value 0
+
+# B
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.b_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.b_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.b_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S4_INTERFACE_CDC.b_fifo_s2a.wptr_flipflop2 	    -value 0
+
+
+
+# ---------------- axi_s5_cdc ---------------- #
+# AW
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.aw_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.aw_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.aw_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.aw_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# W
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.w_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.w_fifo_a2s.rptr_flipflop2 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.w_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.w_fifo_a2s.wptr_flipflop2 	        -value 0
+
+# AR 
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.ar_fifo_a2s.rptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.ar_fifo_a2s.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.ar_fifo_a2s.wptr_gray_r 	        -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.ar_fifo_a2s.wptr_flipflop2 	    -value 0
+
+# R
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.r_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.r_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.r_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.r_fifo_s2a.wptr_flipflop2 	    -value 0
+
+# B
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.b_fifo_s2a.rptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.b_fifo_s2a.rptr_flipflop2 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.b_fifo_s2a.wptr_gray_r 	    -value 0
+define_tag -tag initState -name top.BUS.S5_INTERFACE_CDC.b_fifo_s2a.wptr_flipflop2 	    -value 0
+
+waive -rule Ar_syncrst_setupcheck01
+
+#  async fifo source flip-flop is a static signal, no synchronization may be required
+# m0
+quasi_static -name top.BUS.M0_CDC_INTERFACE.ar_fifo_m2a.mem
+quasi_static -name top.BUS.M0_CDC_INTERFACE.r_fifo_a2m.mem
+# m1
+quasi_static -name top.BUS.M1_CDC_INTERFACE.aw_fifo_m2a.mem
+quasi_static -name top.BUS.M1_CDC_INTERFACE.w_fifo_m2s.mem
+quasi_static -name top.BUS.M1_CDC_INTERFACE.ar_fifo_m2a.mem
+quasi_static -name top.BUS.M1_CDC_INTERFACE.r_fifo_a2m.mem
+quasi_static -name top.BUS.M1_CDC_INTERFACE.B_a2m.mem
+# m2
+quasi_static -name top.BUS.M2_CDC_INTERFACE.aw_fifo_m2a.mem
+quasi_static -name top.BUS.M2_CDC_INTERFACE.w_fifo_m2s.mem
+quasi_static -name top.BUS.M2_CDC_INTERFACE.ar_fifo_m2a.mem
+quasi_static -name top.BUS.M2_CDC_INTERFACE.r_fifo_a2m.mem
+quasi_static -name top.BUS.M2_CDC_INTERFACE.B_a2m.mem
+# s0
+quasi_static -name top.BUS.S0_INTERFACE_CDC.ar_fifo_a2s.mem
+quasi_static -name top.BUS.S0_INTERFACE_CDC.r_fifo_s2a.mem
+# s1
+quasi_static -name top.BUS.S1_INTERFACE_CDC.aw_fifo_a2s.mem
+quasi_static -name top.BUS.S1_INTERFACE_CDC.w_fifo_a2s.mem
+quasi_static -name top.BUS.S1_INTERFACE_CDC.ar_fifo_a2s.mem
+quasi_static -name top.BUS.S1_INTERFACE_CDC.r_fifo_s2a.mem
+quasi_static -name top.BUS.S1_INTERFACE_CDC.b_fifo_s2a.mem
+# s2
+quasi_static -name top.BUS.S2_INTERFACE_CDC.aw_fifo_a2s.mem
+quasi_static -name top.BUS.S2_INTERFACE_CDC.w_fifo_a2s.mem
+quasi_static -name top.BUS.S2_INTERFACE_CDC.ar_fifo_a2s.mem
+quasi_static -name top.BUS.S2_INTERFACE_CDC.r_fifo_s2a.mem
+quasi_static -name top.BUS.S2_INTERFACE_CDC.b_fifo_s2a.mem
+# s3
+quasi_static -name top.BUS.S3_INTERFACE_CDC.aw_fifo_a2s.mem
+quasi_static -name top.BUS.S3_INTERFACE_CDC.w_fifo_a2s.mem
+quasi_static -name top.BUS.S3_INTERFACE_CDC.ar_fifo_a2s.mem
+quasi_static -name top.BUS.S3_INTERFACE_CDC.r_fifo_s2a.mem
+quasi_static -name top.BUS.S3_INTERFACE_CDC.b_fifo_s2a.mem
+# s4
+quasi_static -name top.BUS.S4_INTERFACE_CDC.aw_fifo_a2s.mem
+quasi_static -name top.BUS.S4_INTERFACE_CDC.w_fifo_a2s.mem
+quasi_static -name top.BUS.S4_INTERFACE_CDC.ar_fifo_a2s.mem
+quasi_static -name top.BUS.S4_INTERFACE_CDC.r_fifo_s2a.mem
+quasi_static -name top.BUS.S4_INTERFACE_CDC.b_fifo_s2a.mem
+# s5
+quasi_static -name top.BUS.S5_INTERFACE_CDC.aw_fifo_a2s.mem
+quasi_static -name top.BUS.S5_INTERFACE_CDC.w_fifo_a2s.mem
+quasi_static -name top.BUS.S5_INTERFACE_CDC.ar_fifo_a2s.mem
+quasi_static -name top.BUS.S5_INTERFACE_CDC.r_fifo_s2a.mem
+quasi_static -name top.BUS.S5_INTERFACE_CDC.b_fifo_s2a.mem

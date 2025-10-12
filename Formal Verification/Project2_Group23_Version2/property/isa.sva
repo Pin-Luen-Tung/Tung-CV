@@ -1,0 +1,748 @@
+module  ISA (
+    input         clk_i          ,
+    input         rst_i                
+);
+// RVFI Inputs
+logic [31:0] rvfi_input_insn0;
+logic [31:0] rvfi_input_insn1;
+logic [63:0] rvfi_input_insn;
+
+// Opcode, Function Codes, and Immediate Values
+logic [6:0] wb_insn0_opcode, wb_insn1_opcode, if_insn_opcode;
+logic [6:0] wb_insn0_funct7, wb_insn1_funct7;
+logic [2:0] wb_insn0_funct3, wb_insn1_funct3, if_insn_funct3;
+logic [31:0] wb_insn0_U_imm, wb_insn1_U_imm;
+logic [31:0] wb_insn0_I_imm, wb_insn1_I_imm;
+logic [31:0] wb_insn0_immB, wb_insn1_immB;
+logic [31:0] wb_insn0_J_imm, wb_insn1_J_imm;
+
+// Register Addresses and Data
+logic [4:0] wb_insn0_rd_addr, wb_insn1_rd_addr;
+logic [4:0] wb_insn0_rd_addr_reg, wb_insn1_rd_addr_reg;
+logic [4:0] wb_insn0_rs1_addr, wb_insn1_rs1_addr;
+logic [4:0] wb_insn0_rs2_addr, wb_insn1_rs2_addr;
+logic [4:0] wb_insn0_shamt, wb_insn1_shamt;
+logic [31:0] wb_insn0_rs1_data, wb_insn1_rs1_data;
+logic [31:0] wb_insn0_rs2_data, wb_insn1_rs2_data;
+
+// Pipeline Outputs and Delays
+logic [31:0] PC_result, PC_result_delay;
+logic [31:0] wb_pc;
+logic [31:0] E2_mem_addr0, E2_mem_addr1;
+logic [31:0] WB_mem_addr0, WB_mem_addr1;
+logic wb_stall_o_delay;
+
+// SRAI Logic
+logic is_SRAI_insn0, is_SRAI_insn1;
+logic [31:0] golden_insn0_SRAI, golden_insn1_SRAI;
+logic [31:0] result_insn0_SRAI, result_insn1_SRAI;
+
+// JAL Logic
+logic is_JAL_insn0, is_JAL_insn1;
+logic JAL_insn0_trigger, JAL_insn1_trigger;
+logic [31:0] golden_insn0_pc_JAL, golden_insn1_pc_JAL;
+logic [31:0] golden_insn0_pc_JAL_reg, golden_insn1_pc_JAL_reg;
+logic [31:0] original_insn0_pc_JAL, original_insn1_pc_JAL;
+logic [31:0] golden_insn0_rd_JAL, golden_insn1_rd_JAL;
+logic [31:0] result_insn0_rd_JAL, result_insn1_rd_JAL;
+
+// LW Logic
+logic is_LW_insn0, is_LW_insn1;
+logic [31:0] golden_insn0_LW, golden_insn1_LW;
+logic [31:0] result_insn0_LW, result_insn1_LW;
+logic [31:0] result_LW_delay;
+logic [31:0] address_result, address_result_delay;
+
+// AUIPC Logic
+logic is_AUIPC_insn0, is_AUIPC_insn1;
+logic [31:0] golden_insn0_AUIPC, golden_insn1_AUIPC;
+logic [31:0] result_insn0_AUIPC, result_insn1_AUIPC;
+
+// Branch Prediction
+logic wb_branch_prediction;
+
+// General Logic
+logic [31:0] golden_SRAI_reg;
+
+insn_no_zero0: assume property(rvfi_input_insn0 != 32'd0);
+insn_no_zero1: assume property(rvfi_input_insn1 != 32'd0);
+// Concatenate the two instructions, with rvfi_input_insn0 as the lower 32 bits
+assign rvfi_input_insn = {rvfi_input_insn1, rvfi_input_insn0}; // 0 low bit
+// Instruction set assumptions for rvfi_input_insn0
+rv32i_base_instruction_set0: assume property(
+    rvfi_input_insn0 ==
+        // R-type
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b000) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // add
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b111) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // and
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b110) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // or
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b100) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // xor
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b101) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // srl
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b001) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // sll
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b101) && (rvfi_input_insn0[31:25] == 7'b0100000) && (rvfi_input_insn0[11:7] != 5'd0)) || // sra
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b000) && (rvfi_input_insn0[31:25] == 7'b0100000) && (rvfi_input_insn0[11:7] != 5'd0)) || // sub
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b010) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // slt
+        ((rvfi_input_insn0[6:0] == 7'b0110011) && (rvfi_input_insn0[14:12] == 3'b011) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // sltu
+
+        // I-type
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b100) && (rvfi_input_insn0[11:7] != 5'd0)) || // xori
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b101) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // srli
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b101) && (rvfi_input_insn0[31:25] == 7'b0100000) && (rvfi_input_insn0[11:7] != 5'd0)) || // srai
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b111) && (rvfi_input_insn0[11:7] != 5'd0)) || // andi
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b000) && (rvfi_input_insn0[11:7] != 5'd0)) || // addi
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b001) && (rvfi_input_insn0[31:25] == 7'b0000000) && (rvfi_input_insn0[11:7] != 5'd0)) || // slli
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b011) && (rvfi_input_insn0[11:7] != 5'd0)) || // sltiu
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b010) && (rvfi_input_insn0[11:7] != 5'd0)) || // slti
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[14:12] == 3'b110) && (rvfi_input_insn0[11:7] != 5'd0)) || // ori
+
+        // S-type
+        ((rvfi_input_insn0[6:0] == 7'b0100011) && (rvfi_input_insn0[14:12] == 3'b000)) || // sb
+        ((rvfi_input_insn0[6:0] == 7'b0100011) && (rvfi_input_insn0[14:12] == 3'b001)) || // sh
+        ((rvfi_input_insn0[6:0] == 7'b0100011) && (rvfi_input_insn0[14:12] == 3'b010)) || // sw
+
+        // B-type
+        ((rvfi_input_insn0[6:0] == 7'b1100011) && (rvfi_input_insn0[14:12] == 3'b000)) || // beq
+        ((rvfi_input_insn0[6:0] == 7'b1100011) && (rvfi_input_insn0[14:12] == 3'b001)) || // bne
+        ((rvfi_input_insn0[6:0] == 7'b1100011) && (rvfi_input_insn0[14:12] == 3'b100)) || // blt
+        ((rvfi_input_insn0[6:0] == 7'b1100011) && (rvfi_input_insn0[14:12] == 3'b101)) || // bge
+        ((rvfi_input_insn0[6:0] == 7'b1100011) && (rvfi_input_insn0[14:12] == 3'b110)) || // bltu
+        ((rvfi_input_insn0[6:0] == 7'b1100011) && (rvfi_input_insn0[14:12] == 3'b111)) || // bgeu
+
+        // L-type
+        ((rvfi_input_insn0[6:0] == 7'b0000011) && (rvfi_input_insn0[14:12] == 3'b000) && (rvfi_input_insn0[11:7] != 5'd0)) || // lb
+        ((rvfi_input_insn0[6:0] == 7'b0000011) && (rvfi_input_insn0[14:12] == 3'b001) && (rvfi_input_insn0[11:7] != 5'd0)) || // lh
+        ((rvfi_input_insn0[6:0] == 7'b0000011) && (rvfi_input_insn0[14:12] == 3'b010) && (rvfi_input_insn0[11:7] != 5'd0)) || // lw
+        ((rvfi_input_insn0[6:0] == 7'b0000011) && (rvfi_input_insn0[14:12] == 3'b100) && (rvfi_input_insn0[11:7] != 5'd0)) || // lbu
+        ((rvfi_input_insn0[6:0] == 7'b0000011) && (rvfi_input_insn0[14:12] == 3'b101) && (rvfi_input_insn0[11:7] != 5'd0)) || // lhu
+
+        // U-type
+        ((rvfi_input_insn0[6:0] == 7'b0110111) && (rvfi_input_insn0[11:7] != 5'd0)) || // lui
+        ((rvfi_input_insn0[6:0] == 7'b0010111) && (rvfi_input_insn0[11:7] != 5'd0)) || // auipc
+
+        // J-type
+        ((rvfi_input_insn0[6:0] == 7'b1101111) && (rvfi_input_insn0[11:7] != 5'd0)) || // jal
+        ((rvfi_input_insn0[6:0] == 7'b1100111) && (rvfi_input_insn0[14:12] == 3'b000) && (rvfi_input_insn0[11:7] != 5'd0)) || // jalr
+
+        // NOP
+        ((rvfi_input_insn0[6:0] == 7'b0010011) && (rvfi_input_insn0[31:7] == 25'd0)) ||
+
+        // PRI
+        ((rvfi_input_insn0[19:0] == 20'b00000000000000001111) && (rvfi_input_insn0[31:28] == 4'b0000)) || // fence
+        (rvfi_input_insn0 == 32'b00000000000000000001000000001111) ||                                    // fence_i
+        (rvfi_input_insn0 == 32'b00000000000000000000000001110011) ||                                    // ecall
+        (rvfi_input_insn0 == 32'b00000000000100000000000001110011)                                       // ebreak
+
+        // CSR
+        || ((rvfi_input_insn0[6:0] == 7'b1110011) && (rvfi_input_insn0[14:12] == 3'b001)) // csrrw
+        || ((rvfi_input_insn0[6:0] == 7'b1110011) && (rvfi_input_insn0[14:12] == 3'b010)) // csrrs
+        || ((rvfi_input_insn0[6:0] == 7'b1110011) && (rvfi_input_insn0[14:12] == 3'b011)) // csrrc
+        || ((rvfi_input_insn0[6:0] == 7'b1110011) && (rvfi_input_insn0[14:12] == 3'b101)) // csrrwi
+        || ((rvfi_input_insn0[6:0] == 7'b1110011) && (rvfi_input_insn0[14:12] == 3'b110)) // csrrsi
+        || ((rvfi_input_insn0[6:0] == 7'b1110011) && (rvfi_input_insn0[14:12] == 3'b111)) // csrrci
+);
+// Instruction set assumptions for rvfi_input_insn1
+rv32i_base_instruction_set1: assume property(
+    rvfi_input_insn1 ==
+        // R-type
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b000) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // add
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b111) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // and
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b110) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // or
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b100) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // xor
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b101) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // srl
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b001) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // sll
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b101) && (rvfi_input_insn1[31:25] == 7'b0100000) && (rvfi_input_insn1[11:7] != 5'd0)) || // sra
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b000) && (rvfi_input_insn1[31:25] == 7'b0100000) && (rvfi_input_insn1[11:7] != 5'd0)) || // sub
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b010) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // slt
+        ((rvfi_input_insn1[6:0] == 7'b0110011) && (rvfi_input_insn1[14:12] == 3'b011) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // sltu
+
+        // I-type
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b100) && (rvfi_input_insn1[11:7] != 5'd0)) || // xori
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b101) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // srli
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b101) && (rvfi_input_insn1[31:25] == 7'b0100000) && (rvfi_input_insn1[11:7] != 5'd0)) || // srai
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b111) && (rvfi_input_insn1[11:7] != 5'd0)) || // andi
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b000) && (rvfi_input_insn1[11:7] != 5'd0)) || // addi
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b001) && (rvfi_input_insn1[31:25] == 7'b0000000) && (rvfi_input_insn1[11:7] != 5'd0)) || // slli
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b011) && (rvfi_input_insn1[11:7] != 5'd0)) || // sltiu
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b010) && (rvfi_input_insn1[11:7] != 5'd0)) || // slti
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[14:12] == 3'b110) && (rvfi_input_insn1[11:7] != 5'd0)) || // ori
+
+        // S-type
+        ((rvfi_input_insn1[6:0] == 7'b0100011) && (rvfi_input_insn1[14:12] == 3'b000)) || // sb
+        ((rvfi_input_insn1[6:0] == 7'b0100011) && (rvfi_input_insn1[14:12] == 3'b001)) || // sh
+        ((rvfi_input_insn1[6:0] == 7'b0100011) && (rvfi_input_insn1[14:12] == 3'b010)) || // sw
+
+        // B-type
+        ((rvfi_input_insn1[6:0] == 7'b1100011) && (rvfi_input_insn1[14:12] == 3'b000)) || // beq
+        ((rvfi_input_insn1[6:0] == 7'b1100011) && (rvfi_input_insn1[14:12] == 3'b001)) || // bne
+        ((rvfi_input_insn1[6:0] == 7'b1100011) && (rvfi_input_insn1[14:12] == 3'b100)) || // blt
+        ((rvfi_input_insn1[6:0] == 7'b1100011) && (rvfi_input_insn1[14:12] == 3'b101)) || // bge
+        ((rvfi_input_insn1[6:0] == 7'b1100011) && (rvfi_input_insn1[14:12] == 3'b110)) || // bltu
+        ((rvfi_input_insn1[6:0] == 7'b1100011) && (rvfi_input_insn1[14:12] == 3'b111)) || // bgeu
+
+        // L-type
+        ((rvfi_input_insn1[6:0] == 7'b0000011) && (rvfi_input_insn1[14:12] == 3'b000) && (rvfi_input_insn1[11:7] != 5'd0)) || // lb
+        ((rvfi_input_insn1[6:0] == 7'b0000011) && (rvfi_input_insn1[14:12] == 3'b001) && (rvfi_input_insn1[11:7] != 5'd0)) || // lh
+        ((rvfi_input_insn1[6:0] == 7'b0000011) && (rvfi_input_insn1[14:12] == 3'b010) && (rvfi_input_insn1[11:7] != 5'd0)) || // lw
+        ((rvfi_input_insn1[6:0] == 7'b0000011) && (rvfi_input_insn1[14:12] == 3'b100) && (rvfi_input_insn1[11:7] != 5'd0)) || // lbu
+        ((rvfi_input_insn1[6:0] == 7'b0000011) && (rvfi_input_insn1[14:12] == 3'b101) && (rvfi_input_insn1[11:7] != 5'd0)) || // lhu
+
+        // U-type
+        ((rvfi_input_insn1[6:0] == 7'b0110111) && (rvfi_input_insn1[11:7] != 5'd0)) || // lui
+        ((rvfi_input_insn1[6:0] == 7'b0010111) && (rvfi_input_insn1[11:7] != 5'd0)) || // auipc
+
+        // J-type
+        ((rvfi_input_insn1[6:0] == 7'b1101111) && (rvfi_input_insn1[11:7] != 5'd0)) || // jal
+        ((rvfi_input_insn1[6:0] == 7'b1100111) && (rvfi_input_insn1[14:12] == 3'b000) && (rvfi_input_insn1[11:7] != 5'd0)) || // jalr
+
+        // NOP
+        ((rvfi_input_insn1[6:0] == 7'b0010011) && (rvfi_input_insn1[31:7] == 25'd0)) ||
+
+        // PRI
+        ((rvfi_input_insn1[19:0] == 20'b00000000000000001111) && (rvfi_input_insn1[31:28] == 4'b0000)) || // fence
+        (rvfi_input_insn1 == 32'b00000000000000000001000000001111) ||                                    // fence_i
+        (rvfi_input_insn1 == 32'b00000000000000000000000001110011) ||                                    // ecall
+        (rvfi_input_insn1 == 32'b00000000000100000000000001110011)                                       // ebreak
+
+        // CSR
+        || ((rvfi_input_insn1[6:0] == 7'b1110011) && (rvfi_input_insn1[14:12] == 3'b001)) // csrrw
+        || ((rvfi_input_insn1[6:0] == 7'b1110011) && (rvfi_input_insn1[14:12] == 3'b010)) // csrrs
+        || ((rvfi_input_insn1[6:0] == 7'b1110011) && (rvfi_input_insn1[14:12] == 3'b011)) // csrrc
+        || ((rvfi_input_insn1[6:0] == 7'b1110011) && (rvfi_input_insn1[14:12] == 3'b101)) // csrrwi
+        || ((rvfi_input_insn1[6:0] == 7'b1110011) && (rvfi_input_insn1[14:12] == 3'b110)) // csrrsi
+        || ((rvfi_input_insn1[6:0] == 7'b1110011) && (rvfi_input_insn1[14:12] == 3'b111)) // csrrci
+);
+// ===================== PIPELINE FOLLOWER =====================
+logic [31:0] pre_insn0, pre_insn1, E1_insn0, E1_insn1, E2_insn0, E2_insn1, WB_insn0, WB_insn1;
+logic [31:0] pre_pc0, pre_pc1, E1_pc0, E1_pc1, E2_pc0, E2_pc1, WB_pc0, WB_pc1;
+logic [31:0] opcode_a_r, opcode_b_r, opcode_a_pc_r, opcode_b_pc_r;
+
+// --------------------- Pre-decode Stage ----------------------
+// Fetch instructions and program counters (PC) from the FIFO
+assign pre_insn0 = u_core.u_frontend.u_decode.genblk1.u_fifo.ram_q[u_core.u_frontend.u_decode.genblk1.u_fifo.rd_ptr_q][31:0];
+assign pre_insn1 = u_core.u_frontend.u_decode.genblk1.u_fifo.ram_q[u_core.u_frontend.u_decode.genblk1.u_fifo.rd_ptr_q][63:32];
+assign pre_pc0 = u_core.u_frontend.u_decode.genblk1.u_fifo.pc0_out_o;
+assign pre_pc1 = u_core.u_frontend.u_decode.genblk1.u_fifo.pc1_out_o;
+
+// ---------------------- E1 Stage -----------------------------
+always_comb begin
+    // Default values
+    opcode_a_r = 32'd0;
+    opcode_b_r = 32'd0;
+    opcode_a_pc_r = 32'd0;
+    opcode_b_pc_r = 32'd0;
+
+    // Assign instructions and PCs based on slot validity
+    if (u_core.u_issue.slot0_valid_r) begin
+        opcode_a_r = pre_insn0;         // First instruction
+        opcode_b_r = pre_insn1;         // Second instruction
+        opcode_a_pc_r = pre_pc0;        // PC for first instruction
+        opcode_b_pc_r = pre_pc1;        // PC for second instruction
+    end else if (u_core.u_issue.slot1_valid_r) begin
+        opcode_a_r = pre_insn1;         // Use second instruction
+        opcode_b_r = 32'd0;             // No second instruction in this case
+        opcode_a_pc_r = pre_pc1;        // PC for second instruction
+        opcode_b_pc_r = 32'd0;          // No valid PC for second slot
+    end
+end
+
+// ---------------------- Pipe0 for E1 -------------------------
+always_ff @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        E1_insn0 <= 32'd0;              // Reset instruction
+        E1_pc0 <= 32'd0;                // Reset program counter
+    end else if (u_core.u_issue.u_pipe0_ctrl.issue_stall_i) begin
+        ;// Stall: No operation
+    end else if (u_core.u_issue.u_pipe0_ctrl.issue_valid_i && 
+                 u_core.u_issue.u_pipe0_ctrl.issue_accept_i &&
+                 ~(u_core.u_issue.u_pipe0_ctrl.squash_e1_e2_o || 
+                   u_core.u_issue.u_pipe0_ctrl.squash_e1_e2_i)) begin
+        E1_insn0 <= opcode_a_r;         // Latch instruction
+        E1_pc0 <= opcode_a_pc_r;        // Latch program counter
+    end else begin
+        E1_insn0 <= 32'd0;              // Clear instruction
+        E1_pc0 <= 32'd0;                // Clear program counter
+    end
+end
+
+// ---------------------- Pipe1 for E1 -------------------------
+always_ff @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        E1_insn1 <= 32'd0;              // Reset instruction
+        E1_pc1 <= 32'd0;                // Reset program counter
+    end else if (u_core.u_issue.u_pipe1_ctrl.issue_stall_i) begin
+        ;// Stall: No operation
+    end else if (u_core.u_issue.u_pipe1_ctrl.issue_valid_i && 
+                 u_core.u_issue.u_pipe1_ctrl.issue_accept_i &&
+                 ~(u_core.u_issue.u_pipe1_ctrl.squash_e1_e2_o || 
+                   u_core.u_issue.u_pipe1_ctrl.squash_e1_e2_i)) begin
+        E1_insn1 <= opcode_b_r;         // Latch instruction
+        E1_pc1 <= opcode_b_pc_r;        // Latch program counter
+    end else begin
+        E1_insn1 <= 32'd0;              // Clear instruction
+        E1_pc1 <= 32'd0;                // Clear program counter
+    end
+end
+
+// ---------------------- E2 Stage -----------------------------
+// Pipe0 for E2
+always_ff @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        E2_insn0 <= 32'd0;              // Reset instruction
+        E2_pc0 <= 32'd0;                // Reset program counter
+        E2_mem_addr0 <= 32'd0;          // Reset memory address
+    end else if (u_core.u_issue.u_pipe0_ctrl.issue_stall_i) begin
+        ;// Stall: No operation
+    end else if (u_core.u_issue.u_pipe0_ctrl.squash_e1_e2_o || 
+                 u_core.u_issue.u_pipe0_ctrl.squash_e1_e2_i) begin
+        E2_insn0 <= 32'd0;              // Clear instruction
+        E2_pc0 <= 32'd0;                // Clear program counter
+        E2_mem_addr0 <= 32'd0;          // Clear memory address
+    end else begin
+        E2_insn0 <= E1_insn0;           // Forward instruction
+        E2_pc0 <= E1_pc0;               // Forward program counter
+        E2_mem_addr0 <= u_core.mem_d_addr_o; // Latch memory address
+    end
+end
+
+// Pipe1 for E2
+always_ff @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        E2_insn1 <= 32'd0;              // Reset instruction
+        E2_pc1 <= 32'd0;                // Reset program counter
+        E2_mem_addr1 <= 32'd0;          // Reset memory address
+    end else if (u_core.u_issue.u_pipe1_ctrl.issue_stall_i) begin
+        ;// Stall: No operation
+    end else if (u_core.u_issue.u_pipe1_ctrl.squash_e1_e2_o || 
+                 u_core.u_issue.u_pipe1_ctrl.squash_e1_e2_i) begin
+        E2_insn1 <= 32'd0;              // Clear instruction
+        E2_pc1 <= 32'd0;                // Clear program counter
+        E2_mem_addr1 <= 32'd0;          // Clear memory address
+    end else begin
+        E2_insn1 <= E1_insn1;           // Forward instruction
+        E2_pc1 <= E1_pc1;               // Forward program counter
+        E2_mem_addr1 <= u_core.mem_d_addr_o; // Latch memory address
+    end
+end
+
+// ---------------------- WB Stage -----------------------------
+// Pipe0 for WB
+always_ff @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        WB_insn0 <= 32'd0;              // Reset instruction
+        WB_pc0 <= 32'd0;                // Reset program counter
+        WB_mem_addr0 <= 32'd0;          // Reset memory address
+    end else if (u_core.u_issue.u_pipe0_ctrl.issue_stall_i) begin
+        ;// Stall: No operation
+    end else if (u_core.u_issue.u_pipe0_ctrl.squash_wb_i) begin
+        WB_insn0 <= 32'd0;              // Clear instruction
+        WB_pc0 <= 32'd0;                // Clear program counter
+        WB_mem_addr0 <= 32'd0;          // Clear memory address
+    end else begin
+        WB_insn0 <= E2_insn0;           // Forward instruction
+        WB_pc0 <= E2_pc0;               // Forward program counter
+        WB_mem_addr0 <= E2_mem_addr0;   // Forward memory address
+    end
+end
+
+// Pipe1 for WB
+always_ff @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        WB_insn1 <= 32'd0;              // Reset instruction
+        WB_pc1 <= 32'd0;                // Reset program counter
+        WB_mem_addr1 <= 32'd0;          // Reset memory address
+    end else if (u_core.u_issue.u_pipe1_ctrl.issue_stall_i) begin
+        ;// Stall: No operation
+    end else if (u_core.u_issue.u_pipe1_ctrl.squash_wb_i) begin
+        WB_insn1 <= 32'd0;              // Clear instruction
+        WB_pc1 <= 32'd0;                // Clear program counter
+        WB_mem_addr1 <= 32'd0;          // Clear memory address
+    end else begin
+        WB_insn1 <= E2_insn1;           // Forward instruction
+        WB_pc1 <= E2_pc1;               // Forward program counter
+        WB_mem_addr1 <= E2_mem_addr1; 
+    end
+end 
+// regfile
+logic [31:0] rf [0:31];
+ assign rf[0] = 32'd0;
+  always_comb begin : regfile
+    rf[1]  = u_core.u_issue.u_regfile.REGFILE.reg_r1_q;
+    rf[2]  = u_core.u_issue.u_regfile.REGFILE.reg_r2_q;
+    rf[3]  = u_core.u_issue.u_regfile.REGFILE.reg_r3_q;
+    rf[4]  = u_core.u_issue.u_regfile.REGFILE.reg_r4_q;
+    rf[5]  = u_core.u_issue.u_regfile.REGFILE.reg_r5_q;
+    rf[6]  = u_core.u_issue.u_regfile.REGFILE.reg_r6_q;
+    rf[7]  = u_core.u_issue.u_regfile.REGFILE.reg_r7_q;
+    rf[8]  = u_core.u_issue.u_regfile.REGFILE.reg_r8_q;
+    rf[9]  = u_core.u_issue.u_regfile.REGFILE.reg_r9_q;
+    rf[10] = u_core.u_issue.u_regfile.REGFILE.reg_r10_q;
+    rf[11] = u_core.u_issue.u_regfile.REGFILE.reg_r11_q;
+    rf[12] = u_core.u_issue.u_regfile.REGFILE.reg_r12_q;
+    rf[13] = u_core.u_issue.u_regfile.REGFILE.reg_r13_q;
+    rf[14] = u_core.u_issue.u_regfile.REGFILE.reg_r14_q;
+    rf[15] = u_core.u_issue.u_regfile.REGFILE.reg_r15_q;
+    rf[16] = u_core.u_issue.u_regfile.REGFILE.reg_r16_q;
+    rf[17] = u_core.u_issue.u_regfile.REGFILE.reg_r17_q;
+    rf[18] = u_core.u_issue.u_regfile.REGFILE.reg_r18_q;
+    rf[19] = u_core.u_issue.u_regfile.REGFILE.reg_r19_q;
+    rf[20] = u_core.u_issue.u_regfile.REGFILE.reg_r20_q;
+    rf[21] = u_core.u_issue.u_regfile.REGFILE.reg_r21_q;
+    rf[22] = u_core.u_issue.u_regfile.REGFILE.reg_r22_q;
+    rf[23] = u_core.u_issue.u_regfile.REGFILE.reg_r23_q;
+    rf[24] = u_core.u_issue.u_regfile.REGFILE.reg_r24_q;
+    rf[25] = u_core.u_issue.u_regfile.REGFILE.reg_r25_q;
+    rf[26] = u_core.u_issue.u_regfile.REGFILE.reg_r26_q;
+    rf[27] = u_core.u_issue.u_regfile.REGFILE.reg_r27_q;
+    rf[28] = u_core.u_issue.u_regfile.REGFILE.reg_r28_q;
+    rf[29] = u_core.u_issue.u_regfile.REGFILE.reg_r29_q;
+    rf[30] = u_core.u_issue.u_regfile.REGFILE.reg_r30_q;
+    rf[31] = u_core.u_issue.u_regfile.REGFILE.reg_r31_q;
+  end
+// -------------------------------------------------------
+// Decode Signals for WB Stage
+// -------------------------------------------------------
+assign wb_insn0_opcode = WB_insn0[6:0];
+assign wb_insn0_funct3 = WB_insn0[14:12];
+assign wb_insn0_funct7 = WB_insn0[31:25];
+assign wb_insn0_rd_addr = WB_insn0[11:7];
+assign wb_insn0_rs1_addr = WB_insn0[19:15];
+assign wb_insn0_rs2_addr = WB_insn0[24:20];
+assign wb_insn0_rs1_data = rf[wb_insn0_rs1_addr];
+assign wb_insn0_rs2_data = rf[wb_insn0_rs2_addr];
+assign wb_insn0_I_imm = {{20{WB_insn0[31]}}, WB_insn0[31:20]};
+
+assign wb_insn1_opcode = WB_insn1[6:0];
+assign wb_insn1_funct3 = WB_insn1[14:12];
+assign wb_insn1_funct7 = WB_insn1[31:25];
+assign wb_insn1_rd_addr = WB_insn1[11:7];
+assign wb_insn1_rs1_addr = WB_insn1[19:15];
+assign wb_insn1_rs2_addr = WB_insn1[24:20];
+assign wb_insn1_rs1_data = rf[wb_insn1_rs1_addr];
+assign wb_insn1_rs2_data = rf[wb_insn1_rs2_addr];
+assign wb_insn1_I_imm = {{20{WB_insn1[31]}}, WB_insn1[31:20]};
+
+// -------------------------------------------------------
+// Immediate and Shift Amount Decoding
+// -------------------------------------------------------
+assign wb_insn0_U_imm = {WB_insn0[31:12], 12'd0};
+assign wb_insn1_U_imm = {WB_insn1[31:12], 12'd0};
+assign wb_insn0_immB = {{20{WB_insn0[31]}}, WB_insn0[7], WB_insn0[30:25], WB_insn0[11:8], 1'b0};
+assign wb_insn1_immB = {{20{WB_insn1[31]}}, WB_insn1[7], WB_insn1[30:25], WB_insn1[11:8], 1'b0};
+assign wb_insn0_J_imm = {{12{WB_insn0[31]}}, WB_insn0[19:12], WB_insn0[20], WB_insn0[30:25], WB_insn0[24:21], 1'b0};
+assign wb_insn1_J_imm = {{12{WB_insn1[31]}}, WB_insn1[19:12], WB_insn1[20], WB_insn1[30:25], WB_insn1[24:21], 1'b0};
+assign wb_insn0_shamt = WB_insn0[24:20];
+assign wb_insn1_shamt = WB_insn1[24:20];
+
+// -------------------------------------------------------
+// Register Destination Delays
+// -------------------------------------------------------
+always_ff @(posedge clk_i, posedge rst_i) begin : wb_insn0_rd_addr_reg_delay_
+  if (rst_i)
+    wb_insn0_rd_addr_reg <= 5'd0;
+  else
+    wb_insn0_rd_addr_reg <= wb_insn0_rd_addr;
+end
+
+always_ff @(posedge clk_i, posedge rst_i) begin : wb_insn1_rd_addr_reg_delay_
+  if (rst_i)
+    wb_insn1_rd_addr_reg <= 5'd0;
+  else
+    wb_insn1_rd_addr_reg <= wb_insn1_rd_addr;
+end
+
+// -------------------------------------------------------
+// SRAI Instruction Assertions
+// -------------------------------------------------------
+assign is_SRAI_insn0 = (wb_insn0_opcode == 7'b0010011) & (wb_insn0_funct3 == 3'b101) & (wb_insn0_funct7 == 7'b0100000);
+assign is_SRAI_insn1 = (wb_insn1_opcode == 7'b0010011) & (wb_insn1_funct3 == 3'b101) & (wb_insn1_funct7 == 7'b0100000);
+assign golden_insn0_SRAI = ($signed(wb_insn0_rs1_data) >>> wb_insn0_shamt);
+assign golden_insn1_SRAI = ($signed(wb_insn1_rs1_data) >>> wb_insn1_shamt);
+assign result_insn0_SRAI = rf[wb_insn0_rd_addr_reg];
+assign result_insn1_SRAI = rf[wb_insn1_rd_addr_reg];
+
+// -------------------------------------------------------
+// JAL Instruction Assertions
+// -------------------------------------------------------
+assign is_JAL_insn0 = (wb_insn0_opcode == 7'b1101111) & (u_core.u_issue.u_pipe0_ctrl.exception_wb_q == 1'b0); // No exception
+assign is_JAL_insn1 = (wb_insn1_opcode == 7'b1101111) & (u_core.u_issue.u_pipe1_ctrl.exception_wb_q == 1'b0); // No exception
+assign golden_insn0_rd_JAL = WB_pc0 + 'h4;
+assign golden_insn1_rd_JAL = WB_pc1 + 'h4;
+assign result_insn0_rd_JAL = rf[wb_insn0_rd_addr_reg];
+assign result_insn1_rd_JAL = rf[wb_insn1_rd_addr_reg];
+
+// -------------------------------------------------------
+// LW Instruction Assertions
+// -------------------------------------------------------
+assign is_LW_insn0 = (wb_insn0_opcode == 7'b0000011) & (wb_insn0_funct3 == 3'b010);
+assign is_LW_insn1 = (wb_insn1_opcode == 7'b0000011) & (wb_insn1_funct3 == 3'b010);
+assign golden_insn0_LW = (wb_insn0_rs1_data + wb_insn0_I_imm) & 32'hffff_fffc;
+assign golden_insn1_LW = (wb_insn1_rs1_data + wb_insn1_I_imm) & 32'hffff_fffc;
+assign result_insn0_LW = WB_mem_addr0; // Memory address for LW
+assign result_insn1_LW = WB_mem_addr1; // Memory address for LW
+
+// -------------------------------------------------------
+// AUIPC Instruction Assertions
+// -------------------------------------------------------
+assign is_AUIPC_insn0 = (wb_insn0_opcode == 7'b0010111);
+assign is_AUIPC_insn1 = (wb_insn1_opcode == 7'b0010111);
+assign golden_insn0_AUIPC = WB_pc0 + wb_insn0_U_imm;
+assign golden_insn1_AUIPC = WB_pc1 + wb_insn1_U_imm;
+assign result_insn0_AUIPC = rf[wb_insn0_rd_addr_reg]; // Final written back PC
+assign result_insn1_AUIPC = rf[wb_insn1_rd_addr_reg]; // Final written back PC
+
+// ---------------------------------------------
+// JAL Assertions and Trigger Logic
+// ---------------------------------------------
+
+// Compute the golden PC for JAL instructions
+assign golden_insn0_pc_JAL = (WB_pc0 + wb_insn0_J_imm);
+assign golden_insn1_pc_JAL = (WB_pc1 + wb_insn1_J_imm);
+
+// ---------------------------------------------
+// JAL Trigger for Instruction 0
+// ---------------------------------------------
+always_ff @(posedge clk_i, posedge rst_i) begin
+  if (rst_i) begin
+    // Reset condition
+    JAL_insn0_trigger <= 1'b0;
+    golden_insn0_pc_JAL_reg <= 32'd0;
+    original_insn0_pc_JAL <= 32'd0;
+  end else if (is_JAL_insn0) begin
+    // Trigger JAL logic for instruction 0
+    JAL_insn0_trigger <= 1'b1;
+    golden_insn0_pc_JAL_reg <= golden_insn0_pc_JAL;
+    original_insn0_pc_JAL <= WB_pc0;
+  end else if (WB_insn0 != 32'd0) begin
+    // Clear trigger after execution
+    JAL_insn0_trigger <= 1'b0;
+    golden_insn0_pc_JAL_reg <= 32'd0;
+    original_insn0_pc_JAL <= 32'd0;
+  end
+  else ;
+end
+
+// ---------------------------------------------
+// JAL Trigger for Instruction 1
+// ---------------------------------------------
+always_ff @(posedge clk_i, posedge rst_i) begin
+  if (rst_i) begin
+    // Reset condition
+    JAL_insn1_trigger <= 1'b0;
+    golden_insn1_pc_JAL_reg <= 32'd0;
+    original_insn1_pc_JAL <= 32'd0;
+  end else if (is_JAL_insn1) begin
+    // Trigger JAL logic for instruction 1
+    JAL_insn1_trigger <= 1'b1;
+    golden_insn1_pc_JAL_reg <= golden_insn1_pc_JAL;
+    original_insn1_pc_JAL <= WB_pc1;
+  end else if (WB_insn0 != 32'd0) begin
+    // Clear trigger after execution
+    JAL_insn1_trigger <= 1'b0;
+    golden_insn1_pc_JAL_reg <= 32'd0;
+    original_insn1_pc_JAL <= 32'd0;
+  end
+  else ;
+end
+
+// ---------------------------------------------
+// JAL PC Comparison
+// ---------------------------------------------
+assign same_insn0_pc_JAL = (original_insn0_pc_JAL == WB_pc0);
+assign same_insn1_pc_JAL = (original_insn1_pc_JAL == WB_pc1);
+
+// -------------------------------------------------------
+// LW Assertions
+// -------------------------------------------------------
+LW_insn0_check: assert property (
+    @(posedge clk_i) disable iff (rst_i) 
+    (is_LW_insn0 |-> golden_insn0_LW == result_insn0_LW)
+);
+
+LW_insn1_check: assert property (
+    @(posedge clk_i) disable iff (rst_i) 
+    (is_LW_insn1 |-> golden_insn1_LW == result_insn1_LW)
+);
+
+// -------------------------------------------------------
+// AUIPC Assertions
+// -------------------------------------------------------
+AUIPC_insn0_check: assert property (
+    @(posedge clk_i) disable iff (rst_i) 
+    ((is_AUIPC_insn0 & !u_core.u_issue.u_pipe0_ctrl.issue_stall_i) |=> 
+        $past(golden_insn0_AUIPC) == result_insn0_AUIPC)
+);
+
+AUIPC_insn1_check: assert property (
+    @(posedge clk_i) disable iff (rst_i) 
+    ((is_AUIPC_insn1 & !u_core.u_issue.u_pipe1_ctrl.issue_stall_i) |=> 
+        $past(golden_insn1_AUIPC) == result_insn1_AUIPC)
+);
+
+// -------------------------------------------------------
+// SRAI Assertions
+// -------------------------------------------------------
+SRAI_insn0_check: assert property (
+    @(posedge clk_i) disable iff (rst_i) 
+    ((is_SRAI_insn0 & !u_core.u_issue.u_pipe0_ctrl.issue_stall_i) |=> 
+        $past(golden_insn0_SRAI) == result_insn0_SRAI)
+);
+
+SRAI_insn1_check: assert property (
+    @(posedge clk_i) disable iff (rst_i) 
+    ((is_SRAI_insn1 & !u_core.u_issue.u_pipe1_ctrl.issue_stall_i) |=> 
+        $past(golden_insn1_SRAI) == result_insn1_SRAI)
+);
+
+// ---------------------------------------------
+// JAL Assertions
+// ---------------------------------------------
+
+// Check if the computed PC matches the golden PC for instruction 0
+JAL_PC_check0: assert property(@(posedge clk_i)
+  disable iff(rst_i)
+  ((JAL_insn0_trigger && (WB_insn0 != 32'd0) && !same_insn0_pc_JAL) |-> 
+  (golden_insn0_pc_JAL_reg == WB_pc0)));
+
+// Check if the computed PC matches the golden PC for instruction 1
+JAL_PC_check1: assert property(@(posedge clk_i)
+  disable iff(rst_i)
+  ((JAL_insn1_trigger && (WB_insn0 != 32'd0) && !same_insn1_pc_JAL) |-> 
+  (golden_insn1_pc_JAL_reg == WB_pc0)));
+
+// Check if the destination register is updated correctly for instruction 0
+JAL_rd_check0: assert property(@(posedge clk_i)
+  disable iff(rst_i)
+  ((is_JAL_insn0 && !u_core.u_issue.u_pipe0_ctrl.issue_stall_i) |=> 
+  ($past(golden_insn0_rd_JAL) == result_insn0_rd_JAL)));
+
+// Check if the destination register is updated correctly for instruction 1
+JAL_rd_check1: assert property(@(posedge clk_i)
+  disable iff(rst_i)
+  ((is_JAL_insn1 && !u_core.u_issue.u_pipe1_ctrl.issue_stall_i) |=> 
+  ($past(golden_insn1_rd_JAL) == result_insn1_rd_JAL)));
+
+    // BLTU 指令相關信號定義
+    logic is_BLTU_insn0, is_BLTU_insn1;
+    logic [31:0] BLTU_taken_pc0, BLTU_no_taken_pc0;
+    logic [31:0] BLTU_taken_pc1, BLTU_no_taken_pc1;
+    logic [31:0] BLTU_golden_pc0, BLTU_golden_pc1;
+    logic BLTU_trigger0, BLTU_trigger1;
+    logic [1:0] BLTU_state0, BLTU_state1;
+    logic [1:0] BLTU_state0_reg, BLTU_state1_reg;
+    logic BLTU_same_pc0;
+    logic BLTU_same_pc1;
+    logic [31:0] BLTU_original_pc0;
+    logic [31:0] BLTU_original_pc1;
+    logic [31:0] BLTU_correct_comparator; 
+
+    // 判斷是否為 BLTU 指令
+    assign is_BLTU_insn0 = (wb_insn0_opcode == 7'b1100011) && (wb_insn0_funct3 == 3'b110) & u_core.u_issue.u_pipe0_ctrl.exception_wb_o == 6'd0;
+    assign is_BLTU_insn1 = (wb_insn1_opcode == 7'b1100011) && (wb_insn1_funct3 == 3'b110) & u_core.u_issue.u_pipe1_ctrl.exception_wb_o == 6'd0;
+
+    // 計算 BLTU 的跳轉地址
+    assign BLTU_taken_pc0 = WB_pc0 + wb_insn0_immB;
+    assign BLTU_no_taken_pc0 = WB_pc0 + 32'd4;
+    assign BLTU_taken_pc1 = WB_pc1 + wb_insn1_immB;
+    assign BLTU_no_taken_pc1 = WB_pc1 + 32'd4;
+
+    // 根據 rs1 和 rs2 比較確定跳轉狀態
+    always_comb begin
+        if (is_BLTU_insn0 && (wb_insn0_rs1_data < wb_insn0_rs2_data))
+            BLTU_state0 = 2'b01; // Taken
+        else if (is_BLTU_insn0)
+            BLTU_state0 = 2'b10; // Not Taken
+        else
+            BLTU_state0 = 2'b00; // Invalid
+    end
+
+    always_comb begin
+        if (is_BLTU_insn1 && (wb_insn1_rs1_data < wb_insn1_rs2_data))
+            BLTU_state1 = 2'b01; // Taken
+        else if (is_BLTU_insn1)
+            BLTU_state1 = 2'b10; // Not Taken
+        else
+            BLTU_state1 = 2'b00; // Invalid
+    end
+
+    // BLTU Trigger 判定
+    always_ff @(posedge clk_i or posedge rst_i) begin
+        if (rst_i) begin
+            BLTU_trigger0 <= 1'b0;
+            BLTU_golden_pc0 <= 32'd0;
+            BLTU_original_pc0 <= 32'd0;
+            BLTU_state0_reg <= 2'd0; 
+        end else if (is_BLTU_insn0) begin
+            BLTU_trigger0 <= 1'b1;
+            case (BLTU_state0)
+                2'b01: BLTU_golden_pc0 <= BLTU_taken_pc0;
+                2'b10: BLTU_golden_pc0 <= BLTU_no_taken_pc0;
+                default: BLTU_golden_pc0 <= 32'd0;
+            endcase
+            BLTU_original_pc0 <= WB_pc0;
+            BLTU_state0_reg <= BLTU_state0;
+        end else if (WB_insn0 != 32'd0) begin 
+            BLTU_trigger0 <= 1'b0;
+            BLTU_golden_pc0 <= 32'd0;
+            BLTU_original_pc0 <= 32'd0;
+            BLTU_state0_reg <= 2'd0; 
+        end
+        else ;
+    end
+
+    always_ff @(posedge clk_i or posedge rst_i) begin
+        if (rst_i) begin
+            BLTU_trigger1 <= 1'b0;
+            BLTU_golden_pc1 <= 32'd0;
+            BLTU_original_pc1 <= 32'd0;
+            BLTU_state1_reg <= 2'd0; 
+        end else if (is_BLTU_insn1) begin
+            BLTU_trigger1 <= 1'b1;
+            case (BLTU_state1)
+                2'b01: BLTU_golden_pc1 <= BLTU_taken_pc1;
+                2'b10: BLTU_golden_pc1 <= BLTU_no_taken_pc1;
+                default: BLTU_golden_pc1 <= 32'd0;
+            endcase
+            BLTU_original_pc1 <= WB_pc1;
+            BLTU_state1_reg <= BLTU_state1;
+        end else if (WB_insn0 != 32'd0) begin 
+            BLTU_trigger1 <= 1'b0;
+            BLTU_golden_pc1 <= 32'd0;
+            BLTU_original_pc1 <= 32'd0;
+            BLTU_state1_reg <= 2'd0;
+        end
+        else ;
+    end
+    // PC 比較
+    assign BLTU_same_pc0 = (WB_pc0 == BLTU_original_pc0);
+    assign BLTU_same_pc1 = (WB_pc1 == BLTU_original_pc1);
+    assign BLTU_correct_comparator = WB_pc0;
+    // Assertions for BLTU correctness
+    // BLTU 指令 pipe0
+    assert_bltu_pipe0_taken: assert property (@(posedge clk_i) disable iff (rst_i)
+        (BLTU_trigger0 && (WB_insn0 != 32'd0) && BLTU_state0_reg == 2'b01 && !BLTU_same_pc0)  |-> 
+        (BLTU_correct_comparator == BLTU_golden_pc0)
+    );
+
+    assert_bltu_pipe0_not_taken: assert property (@(posedge clk_i) disable iff (rst_i)
+        (BLTU_trigger0 && (WB_insn0 != 32'd0) &&  BLTU_state0_reg == 2'b10 && !BLTU_same_pc0) |-> 
+        (BLTU_correct_comparator == BLTU_golden_pc0)
+    );
+
+    // BLTU 指令 pipe1
+    assert_bltu_pipe1_taken: assert property (@(posedge clk_i) disable iff (rst_i)
+        (BLTU_trigger1 && (WB_insn0 != 32'd0) && BLTU_state1_reg == 2'b01 && !BLTU_same_pc1) |-> 
+        (BLTU_correct_comparator == BLTU_golden_pc1) 
+    );
+
+    assert_bltu_pipe1_not_taken: assert property (@(posedge clk_i) disable iff (rst_i)
+        (BLTU_trigger1 && (WB_insn0 != 32'd0) && BLTU_state1_reg == 2'b10 && !BLTU_same_pc1) |-> 
+        (BLTU_correct_comparator == BLTU_golden_pc1) 
+    );
+ 
+   
+
+
+endmodule
+
+bind riscv_top ISA formaltest_biriscv(  
+	.clk_i(clk_i),
+	.rst_i(rst_i));

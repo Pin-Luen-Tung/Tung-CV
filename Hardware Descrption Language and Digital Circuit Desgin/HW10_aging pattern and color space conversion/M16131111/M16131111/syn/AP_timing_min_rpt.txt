@@ -1,0 +1,53 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay min
+        -max_paths 1
+        -sort_by group
+Design : AP
+Version: P-2019.03-SP1-1
+Date   : Tue Jun  3 15:13:11 2025
+****************************************
+
+Operating Conditions: ff0p88v125c   Library: N16ADFP_StdCellff0p88v125c
+Wire Load Model Mode: segmented
+
+  Startpoint: Mode[2] (input port clocked by clk)
+  Endpoint: DPo_reg_23_
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  AP                 ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                    Incr       Path
+  -----------------------------------------------------------
+  clock clk (rise edge)                  0.0000     0.0000
+  clock network delay (ideal)            0.2000     0.2000
+  input external delay                   0.0000     0.2000 f
+  Mode[2] (in)                           0.0075     0.2075 f
+  U656/ZN (ND2D1BWP16P90LVT)             0.0086     0.2161 r
+  U524/ZN (CKND1BWP16P90LVT)             0.0049     0.2210 f
+  U654/ZN (AOI211D1BWP16P90LVT)          0.0075     0.2285 r
+  U652/ZN (ND2D1BWP16P90LVT)             0.0070     0.2355 f
+  U795/Z (MUX2D1BWP16P90LVT)             0.0141     0.2496 f
+  DPo_reg_23_/D (DFCNQD2BWP16P90LVT)     0.0000     0.2496 f
+  data arrival time                                 0.2496
+
+  clock clk (rise edge)                  0.0000     0.0000
+  clock network delay (ideal)            0.2000     0.2000
+  clock uncertainty                      0.0200     0.2200
+  DPo_reg_23_/CP (DFCNQD2BWP16P90LVT)    0.0000     0.2200 r
+  library hold time                      0.0292     0.2492
+  data required time                                0.2492
+  -----------------------------------------------------------
+  data required time                                0.2492
+  data arrival time                                -0.2496
+  -----------------------------------------------------------
+  slack (MET)                                       0.0004
+
+
+1

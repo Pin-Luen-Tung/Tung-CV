@@ -1,0 +1,52 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay min
+        -max_paths 1
+        -sort_by group
+Design : CSC
+Version: Q-2019.12
+Date   : Thu Jun  5 21:30:08 2025
+****************************************
+
+Operating Conditions: ff0p88v125c   Library: N16ADFP_StdCellff0p88v125c
+Wire Load Model Mode: segmented
+
+  Startpoint: Mode[0] (input port clocked by clk)
+  Endpoint: DPo_reg_20_
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: min
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  CSC                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                    Incr       Path
+  -----------------------------------------------------------
+  clock clk (rise edge)                  0.0000     0.0000
+  clock network delay (ideal)            0.2000     0.2000
+  input external delay                   0.0000     0.2000 r
+  Mode[0] (in)                           0.0056     0.2056 r
+  U629/ZN (CKND2BWP16P90LVT)             0.0070     0.2126 f
+  U355/Z (AN2D1BWP20P90LVT)              0.0186     0.2312 f
+  U863/ZN (AOI22D1BWP16P90LVT)           0.0104     0.2417 r
+  U864/ZN (OAI211D1BWP16P90LVT)          0.0083     0.2499 f
+  DPo_reg_20_/D (DFCNQD2BWP16P90LVT)     0.0000     0.2499 f
+  data arrival time                                 0.2499
+
+  clock clk (rise edge)                  0.0000     0.0000
+  clock network delay (ideal)            0.2000     0.2000
+  clock uncertainty                      0.0200     0.2200
+  DPo_reg_20_/CP (DFCNQD2BWP16P90LVT)    0.0000     0.2200 r
+  library hold time                      0.0291     0.2491
+  data required time                                0.2491
+  -----------------------------------------------------------
+  data required time                                0.2491
+  data arrival time                                -0.2499
+  -----------------------------------------------------------
+  slack (MET)                                       0.0009
+
+
+1

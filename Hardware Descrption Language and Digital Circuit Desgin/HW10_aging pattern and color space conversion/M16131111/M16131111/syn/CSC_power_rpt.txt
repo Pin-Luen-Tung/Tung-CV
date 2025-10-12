@@ -1,0 +1,76 @@
+Loading db file '/usr/cad/CBDK/Executable_Package/Collaterals/IP/stdcell/N16ADFP_StdCell/NLDM/N16ADFP_StdCellss0p72vm40c.db'
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : CSC
+Version: Q-2019.12
+Date   : Thu Jun  5 21:30:13 2025
+****************************************
+
+
+Library(s) Used:
+
+    N16ADFP_StdCellss0p72vm40c (File: /usr/cad/CBDK/Executable_Package/Collaterals/IP/stdcell/N16ADFP_StdCell/NLDM/N16ADFP_StdCellss0p72vm40c.db)
+
+
+Operating Conditions: ss0p72vm40c   Library: N16ADFP_StdCellss0p72vm40c
+Wire Load Model Mode: segmented
+
+Design        Wire Load Model            Library
+------------------------------------------------
+CSC                    ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_inc_0         ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_inc_2         ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_inc_J15_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_tc_J16_0   ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_tc_J15_0   ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_inc_J19_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_add_J16_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_tc_J15_1   ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_uns_J17_0  ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_inc_J18_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_inc_J22_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_add_J29_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_tc_J33_0   ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_add_J30_1     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_add_J31_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_uns_3      ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW01_add_J43_0     ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_tc_10      ZeroWireload      N16ADFP_StdCellss0p72vm40c
+CSC_DW_mult_tc_11      ZeroWireload      N16ADFP_StdCellss0p72vm40c
+
+
+Global Operating Voltage = 0.72 
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1nW
+
+
+  Cell Internal Power  = 490.5724 uW   (68%)
+  Net Switching Power  = 234.2417 uW   (32%)
+                         ---------
+Total Dynamic Power    = 724.8141 uW  (100%)
+
+Cell Leakage Power     = 565.1729 nW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
+register           0.1590        1.7367e-03           26.5330            0.1608  (  22.16%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational      0.3316            0.2325          538.6367            0.5646  (  77.84%)
+--------------------------------------------------------------------------------------------------
+Total              0.4906 mW         0.2342 mW       565.1696 nW         0.7254 mW
+1

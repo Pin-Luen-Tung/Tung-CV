@@ -1,0 +1,82 @@
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -sort_by group
+Design : AP
+Version: P-2019.03-SP1-1
+Date   : Tue Jun  3 15:13:11 2025
+****************************************
+
+Operating Conditions: ss0p72vm40c   Library: N16ADFP_StdCellss0p72vm40c
+Wire Load Model Mode: segmented
+
+  Startpoint: Tp_H[0] (input port clocked by clk)
+  Endpoint: DPo_reg_19_
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  AP                 ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                    Incr       Path
+  -----------------------------------------------------------
+  clock clk (rise edge)                  0.0000     0.0000
+  clock network delay (ideal)            0.2000     0.2000
+  input external delay                   0.6000     0.8000 f
+  Tp_H[0] (in)                           0.0040     0.8040 f
+  U586/ZN (CKND1BWP16P90LVT)             0.0069     0.8110 r
+  U560/ZN (IND2D1BWP16P90LVT)            0.0096     0.8206 f
+  U743/ZN (ND2D1BWP16P90LVT)             0.0084     0.8290 r
+  U744/ZN (ND2D1BWP16P90LVT)             0.0087     0.8377 f
+  U488/ZN (CKND1BWP16P90LVT)             0.0071     0.8448 r
+  U745/ZN (ND2D1BWP16P90LVT)             0.0084     0.8532 f
+  U490/ZN (CKND1BWP16P90LVT)             0.0071     0.8603 r
+  U746/ZN (ND2D1BWP16P90LVT)             0.0084     0.8686 f
+  U494/ZN (CKND1BWP16P90LVT)             0.0071     0.8758 r
+  U747/ZN (ND2D1BWP16P90LVT)             0.0081     0.8839 f
+  U495/ZN (CKND1BWP16P90LVT)             0.0070     0.8909 r
+  U748/ZN (ND2D1BWP16P90LVT)             0.0081     0.8991 f
+  U496/ZN (CKND1BWP16P90LVT)             0.0070     0.9060 r
+  U749/ZN (ND2D1BWP16P90LVT)             0.0084     0.9144 f
+  U497/ZN (CKND1BWP16P90LVT)             0.0071     0.9215 r
+  U750/ZN (ND2D1BWP16P90LVT)             0.0114     0.9329 f
+  U517/Z (OA21D1BWP16P90LVT)             0.0147     0.9476 f
+  U753/ZN (ND2D1BWP16P90LVT)             0.0073     0.9549 r
+  U602/ZN (CKND1BWP16P90LVT)             0.0049     0.9597 f
+  U768/ZN (OAI32D1BWP16P90LVT)           0.0139     0.9736 r
+  U769/ZN (AOI21D1BWP16P90LVT)           0.0079     0.9815 f
+  U770/ZN (OAI22D1BWP16P90LVT)           0.0101     0.9916 r
+  U771/ZN (AOI31D1BWP16P90LVT)           0.0069     0.9985 f
+  U772/ZN (NR4D1BWP16P90LVT)             0.0187     1.0172 r
+  U460/Z (OA22D1BWP20P90LVT)             0.0194     1.0367 r
+  U692/ZN (OAI211D1BWP16P90LVT)          0.0108     1.0475 f
+  U570/ZN (CKND1BWP16P90LVT)             0.0083     1.0557 r
+  U657/Z (MUX2D1BWP16P90LVT)             0.0139     1.0696 r
+  U656/ZN (ND2D1BWP16P90LVT)             0.0088     1.0784 f
+  U648/ZN (ND2D1BWP16P90LVT)             0.0143     1.0927 r
+  U638/ZN (AOI21D1BWP16P90LVT)           0.0075     1.1002 f
+  U637/ZN (ND2D1BWP16P90LVT)             0.0074     1.1077 r
+  U791/Z (MUX2D1BWP16P90LVT)             0.0134     1.1211 r
+  DPo_reg_19_/D (DFCNQD2BWP16P90LVT)     0.0000     1.1211 r
+  data arrival time                                 1.1211
+
+  clock clk (rise edge)                  1.0000     1.0000
+  clock network delay (ideal)            0.2000     1.2000
+  clock uncertainty                     -0.0200     1.1800
+  DPo_reg_19_/CP (DFCNQD2BWP16P90LVT)    0.0000     1.1800 r
+  library setup time                    -0.0044     1.1756
+  data required time                                1.1756
+  -----------------------------------------------------------
+  data required time                                1.1756
+  data arrival time                                -1.1211
+  -----------------------------------------------------------
+  slack (MET)                                       0.0546
+
+
+1

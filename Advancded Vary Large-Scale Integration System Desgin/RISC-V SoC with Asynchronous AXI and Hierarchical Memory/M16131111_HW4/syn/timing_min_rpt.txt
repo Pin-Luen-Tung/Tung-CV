@@ -1,0 +1,421 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay min
+        -max_paths 1
+        -sort_by group
+Design : CHIP
+Version: Q-2019.12
+Date   : Fri Dec 20 18:30:14 2024
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: ff0p88v125c   Library: N16ADFP_StdCellff0p88v125c
+Wire Load Model Mode: segmented
+
+  Startpoint: u_TOP/BUS/AW_using_reg
+              (rising edge-triggered flip-flop clocked by axi_clk)
+  Endpoint: u_TOP/BUS/B_decode_reg_1_
+            (rising edge-triggered flip-flop clocked by axi_clk)
+  Path Group: axi_clk
+  Path Type: min
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  ASYN_FIFO_Databits10_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_10
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_9
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_8
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_7
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_6
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits6_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits6_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits39_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits39_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_7
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_6
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_3      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_2      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_1      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_0      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  M_INTERFACE_0      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_11
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits6_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits39_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_8
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  default_slave      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  arbiter            ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  arbiter_3M         ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_4      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_5      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  M_INTERFACE_1      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  M_INTERFACE_2      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  AXI                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CHIP               ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  top                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock axi_clk (rise edge)                               0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  u_TOP/BUS/AW_using_reg/CP (DFCNQD2BWP16P90LVT)          0.00 #     0.50 r
+  u_TOP/BUS/AW_using_reg/Q (DFCNQD2BWP16P90LVT)           0.06       0.56 r
+  u_TOP/BUS/U43/ZN (INVD1BWP16P90LVT)                     0.00       0.56 f
+  u_TOP/BUS/U44/ZN (INVD1BWP16P90LVT)                     0.01       0.57 r
+  u_TOP/BUS/U1166/ZN (NR2D1BWP16P90LVT)                   0.03       0.60 f
+  u_TOP/BUS/U45/Z (CKBD1BWP16P90LVT)                      0.02       0.62 f
+  u_TOP/BUS/U603/ZN (IND2D1BWP16P90LVT)                   0.01       0.62 r
+  u_TOP/BUS/U623/ZN (OAI21D1BWP16P90LVT)                  0.01       0.63 f
+  u_TOP/BUS/B_decode_reg_1_/D (DFCNQD2BWP16P90LVT)        0.00       0.63 f
+  data arrival time                                                  0.63
+
+  clock axi_clk (rise edge)                               0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  clock uncertainty                                       0.10       0.60
+  u_TOP/BUS/B_decode_reg_1_/CP (DFCNQD2BWP16P90LVT)       0.00       0.60 r
+  library hold time                                       0.03       0.63
+  data required time                                                 0.63
+  --------------------------------------------------------------------------
+  data required time                                                 0.63
+  data arrival time                                                 -0.63
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+  Startpoint: u_TOP/CPU_wrap/Dcache/core_addr_r_reg_28_
+              (rising edge-triggered flip-flop clocked by cpu_clk)
+  Endpoint: u_TOP/CPU_wrap/Dcache/TA/i_tag_array1
+            (rising edge-triggered flip-flop clocked by cpu_clk)
+  Path Group: cpu_clk
+  Path Type: min
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  ASYN_FIFO_Databits10_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_9
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_8
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_7
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_6
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits6_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits6_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits39_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits39_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_7
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_6
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_4
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  tag_array_wrapper_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  data_array_wrapper_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_3      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_2      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  M_INTERFACE_0      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  SRAM_wrapper_0     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits6_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits39_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_8
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits45_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  tag_array_wrapper_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  data_array_wrapper_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CSR_EXE_IP         ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  MUL_IP             ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  FP_IP              ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CSR_IP             ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  REGISTERFILE_FP_IP ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  REGISTERFILE_IP    ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  PC_IP              ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_4      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  M_INTERFACE_1      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  M_INTERFACE_2      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  L1C_data           ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  L1C_inst           ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CPU                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  DMA                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  AXI                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CPU_wrapper        ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  DMA_wrapper        ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  SRAM_wrapper_1     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CHIP               ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  top                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock cpu_clk (rise edge)                               0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  u_TOP/CPU_wrap/Dcache/core_addr_r_reg_28_/CP (DFCNQD2BWP16P90LVT)
+                                                          0.00 #     0.50 r
+  u_TOP/CPU_wrap/Dcache/core_addr_r_reg_28_/Q (DFCNQD2BWP16P90LVT)
+                                                          0.06       0.56 r
+  u_TOP/CPU_wrap/Dcache/U19/Z (BUFFD1BWP16P90LVT)         0.01       0.57 r
+  u_TOP/CPU_wrap/Dcache/U44/Z (DEL025D1BWP20P90)          0.04       0.61 r
+  u_TOP/CPU_wrap/Dcache/U43/Z (CKBD1BWP16P90LVT)          0.01       0.62 r
+  u_TOP/CPU_wrap/Dcache/TA/DI[19] (tag_array_wrapper_0)
+                                                          0.00       0.62 r
+  u_TOP/CPU_wrap/Dcache/TA/i_tag_array1/D[19] (TS1N16ADFPCLLLVTA128X64M4SWSHOD_tag_array)
+                                                          0.00       0.62 r
+  data arrival time                                                  0.62
+
+  clock cpu_clk (rise edge)                               0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  clock uncertainty                                       0.10       0.60
+  u_TOP/CPU_wrap/Dcache/TA/i_tag_array1/CLK (TS1N16ADFPCLLLVTA128X64M4SWSHOD_tag_array)
+                                                          0.00       0.60 r
+  library hold time                                       0.15       0.75
+  data required time                                                 0.75
+  --------------------------------------------------------------------------
+  data required time                                                 0.75
+  data arrival time                                                 -0.62
+  --------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.13
+
+
+  Startpoint: u_TOP/DRAM_wrap/ARADDR_r_reg_31_
+              (rising edge-triggered flip-flop clocked by dram_clk)
+  Endpoint: u_TOP/DRAM_wrap/ARADDR_r_reg_31_
+            (rising edge-triggered flip-flop clocked by dram_clk)
+  Path Group: dram_clk
+  Path Type: min
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  ASYN_FIFO_Databits10_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_0
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_0      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  DRAM_controller    ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  AXI                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  DRAM_wrapper       ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CHIP               ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  top                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  DRAM_wrapper_DW01_add_0_DW01_add_21
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock dram_clk (rise edge)                              0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  u_TOP/DRAM_wrap/ARADDR_r_reg_31_/CP (DFCNQD2BWP16P90LVT)
+                                                          0.00       0.50 r
+  u_TOP/DRAM_wrap/ARADDR_r_reg_31_/Q (DFCNQD2BWP16P90LVT)
+                                                          0.06       0.56 f
+  u_TOP/DRAM_wrap/U321/Z (AO22D4BWP20P90)                 0.03       0.59 f
+  u_TOP/DRAM_wrap/U320/Z (DEL025D1BWP20P90)               0.04       0.63 f
+  u_TOP/DRAM_wrap/ARADDR_r_reg_31_/D (DFCNQD2BWP16P90LVT)
+                                                          0.00       0.63 f
+  data arrival time                                                  0.63
+
+  clock dram_clk (rise edge)                              0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  clock uncertainty                                       0.10       0.60
+  u_TOP/DRAM_wrap/ARADDR_r_reg_31_/CP (DFCNQD2BWP16P90LVT)
+                                                          0.00       0.60 r
+  library hold time                                       0.03       0.63
+  data required time                                                 0.63
+  --------------------------------------------------------------------------
+  data required time                                                 0.63
+  data arrival time                                                 -0.63
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+  Startpoint: u_TOP/WDT_wrap/R_burst_r_reg_2_
+              (rising edge-triggered flip-flop clocked by rom_clk)
+  Endpoint: u_TOP/WDT_wrap/R_burst_r_reg_2_
+            (rising edge-triggered flip-flop clocked by rom_clk)
+  Path Group: rom_clk
+  Path Type: min
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  ASYN_FIFO_Databits10_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_10
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_3
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_2
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits37_Addrbits2_1
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_1      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits10_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits43_Addrbits2_5
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ASYN_FIFO_Databits49_Addrbits2_11
+                     ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  S_INTERFACE_5      ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  WDT                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  AXI                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  WDT_wrapper        ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  ROM_wrapper        ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  CHIP               ZeroWireload          N16ADFP_StdCellss0p72vm40c
+  top                ZeroWireload          N16ADFP_StdCellss0p72vm40c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock rom_clk (rise edge)                               0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  u_TOP/WDT_wrap/R_burst_r_reg_2_/CP (DFCNQD2BWP16P90LVT)
+                                                          0.00       0.50 r
+  u_TOP/WDT_wrap/R_burst_r_reg_2_/Q (DFCNQD2BWP16P90LVT)
+                                                          0.06       0.56 r
+  u_TOP/WDT_wrap/U127/Z (CKBD1BWP16P90LVT)                0.01       0.57 r
+  u_TOP/WDT_wrap/U184/Z (CKMUX2D1BWP20P90)                0.03       0.59 f
+  u_TOP/WDT_wrap/U126/Z (CKBD1BWP16P90LVT)                0.01       0.60 f
+  u_TOP/WDT_wrap/U125/Z (CKBD1BWP16P90LVT)                0.01       0.61 f
+  u_TOP/WDT_wrap/U124/Z (CKBD1BWP16P90LVT)                0.01       0.62 f
+  u_TOP/WDT_wrap/U122/ZN (INVD1BWP16P90LVT)               0.00       0.63 r
+  u_TOP/WDT_wrap/U123/ZN (INVD1BWP16P90LVT)               0.00       0.63 f
+  u_TOP/WDT_wrap/R_burst_r_reg_2_/D (DFCNQD2BWP16P90LVT)
+                                                          0.00       0.63 f
+  data arrival time                                                  0.63
+
+  clock rom_clk (rise edge)                               0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  clock uncertainty                                       0.10       0.60
+  u_TOP/WDT_wrap/R_burst_r_reg_2_/CP (DFCNQD2BWP16P90LVT)
+                                                          0.00       0.60 r
+  library hold time                                       0.03       0.63
+  data required time                                                 0.63
+  --------------------------------------------------------------------------
+  data required time                                                 0.63
+  data arrival time                                                 -0.63
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.00
+
+
+1

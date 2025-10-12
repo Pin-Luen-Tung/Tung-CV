@@ -1,0 +1,371 @@
+
+module  ISA (
+    input         HCLK                   ,
+    input         HRESETn                
+);
+	
+    logic [6:0]     wb_insn_opcode;
+    logic [2:0]     wb_insn_funct3;
+    logic [6:0]     if_insn_opcode;
+    logic [2:0]     if_insn_funct3;
+    logic [6:0]     wb_insn_funct7;
+    logic [4:0]     wb_insn_rd_addr;
+	logic [4:0]     wb_insn_rd_addr_reg;
+    logic [4:0]     wb_insn_rs1_addr;
+    logic [4:0]     wb_insn_rs2_addr;
+	logic [4:0]     wb_insn_shamt;
+    logic [31:0]    wb_I_imm ;
+    logic [31:0]    if_insn_immU ;
+    logic [31:0]    wb_insn_immB;
+    logic [31:0]    wb_rs1_data ;
+    logic [31:0]    wb_rs2_data ;
+    logic [31:0] rvfi_input_insn;
+	logic wb_stall_o_delay;
+	logic [31:0] golden_SRAI;
+    logic [31:0] golden_SRAI_reg;
+    logic [31:0] result_SRAI;
+	logic is_SRAI_insn;
+    logic is_JAL_insn;
+    logic [31:0] golden_PC_JAL;
+    logic [31:0] golden_rd_JAL;
+    logic [31:0] golden_rd_JAL_reg;
+    logic [31:0] result_rd_JAL;
+    logic [31:0] PC_result;
+    logic [31:0] PC_result_delay;
+	logic [31:0]wb_insn_immJ;
+    logic is_LW_insn;
+    logic [31:0] golden_LW;
+    logic [31:0] result_LW;
+    logic [31:0] result_LW_delay;
+	logic [31:0] address_result;
+    logic [31:0] address_result_delay;
+    logic is_AUIPC_insn;
+    logic [31:0] golden_rd_AUIPC;
+    logic [31:0] if_golden_rd_AUIPC;
+    logic [31:0] pd_golden_rd_AUIPC;
+    logic [31:0] id_golden_rd_AUIPC;
+    logic [31:0] ex_golden_rd_AUIPC;
+    logic [31:0] mem_golden_rd_AUIPC;
+    logic [31:0] wb_golden_rd_AUIPC;
+    logic [31:0] golden_rd_AUIPC_reg;
+    logic [31:0] result_rd_AUIPC;
+rv32i_base_instruction_set : assume property(rvfi_input_insn == 	
+     // R-type   	
+	((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b000)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // add
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b111)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // and
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b110)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // or
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b100)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // xor
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b101)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // srl
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b001)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // sll
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b101)&&(rvfi_input_insn[31:25] == 7'b0100000)&&(rvfi_input_insn[11:7]!=5'd0))  // sra
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b000)&&(rvfi_input_insn[31:25] == 7'b0100000)&&(rvfi_input_insn[11:7]!=5'd0))  // sub
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b010)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // slt
+	||((rvfi_input_insn[6:0] == 7'b0110011)&&(rvfi_input_insn[14:12] == 3'b011)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // sltu
+
+	// I-type 		
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b100)&&(rvfi_input_insn[11:7]!=5'd0))  // xori
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b101)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // srli
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b101)&&(rvfi_input_insn[31:25] == 7'b0100000)&&(rvfi_input_insn[11:7]!=5'd0))  // srai
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b111)&&(rvfi_input_insn[11:7]!=5'd0))  // andi
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b000)&&(rvfi_input_insn[11:7]!=5'd0))  // addi
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b001)&&(rvfi_input_insn[31:25] == 7'b0000000)&&(rvfi_input_insn[11:7]!=5'd0))  // slli
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b011)&&(rvfi_input_insn[11:7]!=5'd0))  // sltiu
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b010)&&(rvfi_input_insn[11:7]!=5'd0))  // slti
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[14:12] == 3'b110)&&(rvfi_input_insn[11:7]!=5'd0))  // ori
+
+    // S-type  		
+	||((rvfi_input_insn[6:0] == 7'b0100011)&&(rvfi_input_insn[14:12] == 3'b000))  // sb
+	||((rvfi_input_insn[6:0] == 7'b0100011)&&(rvfi_input_insn[14:12] == 3'b001))  // sh
+	||((rvfi_input_insn[6:0] == 7'b0100011)&&(rvfi_input_insn[14:12] == 3'b010))  // sw
+
+	// B-type   	
+	||((rvfi_input_insn[6:0] == 7'b1100011)&&(rvfi_input_insn[14:12] == 3'b000))  // beq
+	||((rvfi_input_insn[6:0] == 7'b1100011)&&(rvfi_input_insn[14:12] == 3'b001))  // bne
+	||((rvfi_input_insn[6:0] == 7'b1100011)&&(rvfi_input_insn[14:12] == 3'b100))  // blt
+	||((rvfi_input_insn[6:0] == 7'b1100011)&&(rvfi_input_insn[14:12] == 3'b101))  // bge
+	||((rvfi_input_insn[6:0] == 7'b1100011)&&(rvfi_input_insn[14:12] == 3'b110))  // bltu
+	||((rvfi_input_insn[6:0] == 7'b1100011)&&(rvfi_input_insn[14:12] == 3'b111))  // bgeu
+
+	// L-type  		
+	||((rvfi_input_insn[6:0] == 7'b0000011)&&(rvfi_input_insn[14:12] == 3'b000)&&(rvfi_input_insn[11:7]!=5'd0))  // lb
+	||((rvfi_input_insn[6:0] == 7'b0000011)&&(rvfi_input_insn[14:12] == 3'b001)&&(rvfi_input_insn[11:7]!=5'd0))  // lh
+	||((rvfi_input_insn[6:0] == 7'b0000011)&&(rvfi_input_insn[14:12] == 3'b010)&&(rvfi_input_insn[11:7]!=5'd0))  // lw
+	||((rvfi_input_insn[6:0] == 7'b0000011)&&(rvfi_input_insn[14:12] == 3'b100)&&(rvfi_input_insn[11:7]!=5'd0))  // lbu
+	||((rvfi_input_insn[6:0] == 7'b0000011)&&(rvfi_input_insn[14:12] == 3'b101)&&(rvfi_input_insn[11:7]!=5'd0))  // lhu
+
+	// U-type 	
+	||((rvfi_input_insn[6:0] == 7'b0110111)&&(rvfi_input_insn[11:7]!=5'd0))  // lui
+	||((rvfi_input_insn[6:0] == 7'b0010111)&&(rvfi_input_insn[11:7]!=5'd0))  // auipc
+
+    	// J-type 	
+	||((rvfi_input_insn[6:0] == 7'b1101111)&&(rvfi_input_insn[11:7]!=5'd0)) // jal
+	||((rvfi_input_insn[6:0] == 7'b1100111)&&(rvfi_input_insn[14:12] == 3'b000)&&(rvfi_input_insn[11:7]!=5'd0))  // jalr
+
+	// NOP   
+	||((rvfi_input_insn[6:0] == 7'b0010011)&&(rvfi_input_insn[31:7] == 25'd0))
+	
+	// PRI 
+	||((rvfi_input_insn[19:0] == 20'b00000000000000001111) && (rvfi_input_insn[31:28] == 4'b0000)) // fence
+	||(rvfi_input_insn == 32'b00000000000000000001000000001111)  // fence_i
+	||(rvfi_input_insn == 32'b00000000000000000000000001110011) // ecall
+	||(rvfi_input_insn == 32'b00000000000100000000000001110011) // ebreak
+	
+	// CSR  
+	||((rvfi_input_insn[6:0] == 7'b1110011) && (rvfi_input_insn[14:12] == 3'b001)) // csrrw
+	||((rvfi_input_insn[6:0] == 7'b1110011) && (rvfi_input_insn[14:12] == 3'b010)) // csrrs
+	||((rvfi_input_insn[6:0] == 7'b1110011) && (rvfi_input_insn[14:12] == 3'b011)) // csrrc
+	||((rvfi_input_insn[6:0] == 7'b1110011) && (rvfi_input_insn[14:12] == 3'b101)) // csrrwi
+	||((rvfi_input_insn[6:0] == 7'b1110011) && (rvfi_input_insn[14:12] == 3'b110)) // csrrsi
+	||((rvfi_input_insn[6:0] == 7'b1110011) && (rvfi_input_insn[14:12] == 3'b111)) // csrrci 
+);
+no_st_flush: assume property(##2 core.id_unit.st_flush_i == 0);
+// we do not care 16 bit instruction
+no_16bit_insn: assume property (core.if_unit.parcel12[1:0] == 2'b11);
+
+
+parameter NOP = 32'h13;
+parameter INIT_PC   = 32'd0;
+
+logic [31:0] if_insn, pd_insn, id_insn, ex_insn, mem_insn, wb_insn;
+logic [31:0] if_pc, pd_pc, id_pc, ex_pc, mem_pc, wb_pc;
+logic		 if_branch_prediction, pd_branch_prediction, id_branch_prediction, ex_branch_prediction, mem_branch_prediction, wb_branch_prediction;
+logic ex_no_bubble_follower;
+logic mem_no_bubble_follower;
+// pipeline follower
+// IF stage 
+assign if_branch_prediction = core.bp_unit.bp_bp_predict_o[1];
+assign if_insn = (core.if_unit.if_insn_o.bubble) ? NOP : core.if_unit.if_insn_o.instr;
+assign if_pc = (core.if_unit.if_insn_o.bubble) ? 32'd0 : core.if_unit.if_pc_o;
+// PD stage 
+always_ff @( posedge HCLK or negedge HRESETn )begin
+	if (!HRESETn) begin 
+        pd_insn <= 32'd0;
+        pd_pc <= 32'd0;
+        pd_branch_prediction <= 1'd0;
+    end
+    else if	(core.pd_unit.pd_flush_o) begin 
+        pd_insn <= NOP;
+        pd_pc <= 32'd0;
+        pd_branch_prediction <= 1'd0;
+    end	
+	else if	(core.pd_unit.id_stall_i)
+      ;
+	else begin 
+        pd_insn <= if_insn;
+        pd_pc <= if_pc;
+        pd_branch_prediction <= if_branch_prediction;
+		pd_golden_rd_AUIPC <= if_golden_rd_AUIPC; 
+    end	
+end
+// ID stage 
+always_ff @( posedge HCLK or negedge HRESETn )begin
+	if (!HRESETn) begin 
+        id_insn <= 32'd0;
+        id_pc <= 32'd0;
+        id_branch_prediction <= 1'd0;
+    end
+    else if	(core.id_unit.flushes) begin 
+        id_insn <= NOP;
+        id_pc <= 32'd0;
+        id_branch_prediction <= 1'd0;
+    end	
+	else if	(core.id_unit.stalls)
+      ;
+	else
+    begin 
+        id_insn <= pd_insn;
+        id_pc <= (core.id_unit.bu_flush_i || core.id_unit.stalls) ? 32'd0 : pd_pc;
+        id_branch_prediction <= pd_branch_prediction;
+		id_golden_rd_AUIPC <= pd_golden_rd_AUIPC;
+    end	
+end
+// EX stage 
+logic [31:0] id_insn_o, id_pc_o;
+assign id_insn_o = (core.id_unit.bu_flush_i || core.id_unit.stalls) ? 32'd0 : id_insn;
+assign id_pc_o =  (core.id_unit.bu_flush_i || core.id_unit.stalls) ? 32'd0 : id_pc;
+
+always_ff @( posedge HCLK or negedge HRESETn )begin
+	if (!HRESETn)
+    begin 
+        ex_insn <= 32'd0;
+        ex_pc <= 32'd0;
+        ex_branch_prediction <= 1'd0;
+    end
+	else if	(core.ex_units.ex_stall_o)
+      ;
+    else begin 
+        ex_insn <= id_insn_o;
+        ex_pc <= id_pc_o;
+        ex_branch_prediction <= id_branch_prediction;
+		ex_no_bubble_follower <= !core.id_unit.id_insn_o.bubble;
+		ex_golden_rd_AUIPC <= id_golden_rd_AUIPC; 
+    end	
+end
+
+// MEM stage 
+always_ff @( posedge HCLK or negedge HRESETn )begin
+	if (!HRESETn) begin 
+        mem_insn <= 32'd0;
+        mem_pc <= 32'd0;
+        mem_branch_prediction <= 1'd0;
+    end
+	else if	(core.mem_unit0.mem_stall_i)
+      ;
+    else begin 
+        mem_insn <= ex_insn;
+        mem_pc <= ex_pc;
+        mem_branch_prediction <= ex_branch_prediction;
+		mem_no_bubble_follower <= ex_no_bubble_follower;
+		mem_golden_rd_AUIPC <= ex_golden_rd_AUIPC; 
+    end	
+end
+
+// WB stage 
+always_ff @( posedge HCLK or negedge HRESETn )begin
+	if (!HRESETn) begin 
+        wb_insn <= 32'd0;
+        wb_pc <= 32'd0;
+        wb_branch_prediction <= 1'd0;
+    end
+	else if	(core.wb_unit.wb_stall_o) begin 
+      ;
+    end	
+    else begin 
+        wb_insn <= mem_insn;
+        wb_pc <= mem_pc;
+        wb_branch_prediction <= mem_branch_prediction;
+		wb_no_bubble <= mem_no_bubble_follower;
+		wb_golden_rd_AUIPC <= mem_golden_rd_AUIPC; 
+    end	
+end
+
+
+
+
+assign wb_insn_opcode = wb_insn[6:0];
+assign wb_insn_funct3 = wb_insn[14:12];
+assign wb_insn_funct7 = wb_insn[31:25];
+assign wb_insn_rd_addr   = wb_insn[11:7];
+assign wb_insn_rs1_addr  = wb_insn[19:15];
+assign wb_insn_rs2_addr  = wb_insn[24:20];
+assign wb_rs1_data = (wb_insn_rs1_addr==5'd0) ? 32'd0 : core.int_rf.rf[wb_insn_rs1_addr];
+assign wb_rs2_data = (wb_insn_rs2_addr==5'd0) ? 32'd0 : core.int_rf.rf[wb_insn_rs2_addr];
+assign wb_I_imm = {{20{wb_insn[31]}},wb_insn[31:20]};
+assign wb_U_imm = {wb_insn[31:12],12'd0};
+assign wb_insn_immB= {{20{wb_insn[31]}},wb_insn[7],wb_insn[30:25],wb_insn[11:8],1'b0};
+assign is_SRAI_insn = (wb_insn_opcode == 7'b0010011) & (wb_insn_funct3 == 3'b101) & (wb_insn_funct7 == 7'b0100000) & (core.wb_unit.wb_insn_o.bubble == 1'b0);
+assign wb_insn_shamt = wb_insn[24:20];
+assign wb_insn_immJ = {{12{if_insn[31]}},if_insn[19:12],if_insn[20],if_insn[30:25],if_insn[24:21],1'b0};
+assign if_insn_immU = {if_insn[31:12],12'd0};
+assign if_insn_opcode = if_insn[6:0];
+assign if_insn_funct3 = if_insn[14:12];
+// SRAI
+always_ff @(posedge HCLK, negedge HRESETn) begin : wb_stall_o_delay_
+  if (!HRESETn) wb_stall_o_delay <= 1'd0;
+  else          wb_stall_o_delay <= core.wb_unit.wb_stall_o;
+end
+always_ff @(posedge HCLK, negedge HRESETn) begin : golden_SRAI_reg_delay_
+  if (!HRESETn) golden_SRAI_reg <= 32'd0;
+  else if (wb_stall_o_delay) golden_SRAI_reg <= golden_SRAI_reg; //要在wbstall發生的下個clk維持golden值
+  else          golden_SRAI_reg <= golden_SRAI;
+end
+// rd address delay
+always_ff @(posedge HCLK, negedge HRESETn) begin : wb_insn_rd_addr_reg_delay_
+  if (!HRESETn) wb_insn_rd_addr_reg <= 5'd0;
+  else          wb_insn_rd_addr_reg <= wb_insn_rd_addr;
+end
+// JAL
+  always_ff @(posedge HCLK, negedge HRESETn) begin : golden_rd_JAL_reg_delay
+    if (!HRESETn) golden_rd_JAL_reg <= 32'd0;
+    else if (wb_stall_o_delay) golden_rd_JAL_reg <= golden_rd_JAL; //要在wbstall發生的下個clk維持golden值
+    else          golden_rd_JAL_reg <= golden_rd_JAL;
+  end
+// LW
+always_ff @(posedge HCLK, negedge HRESETn) begin : result_LW_delayy
+  if (!HRESETn) result_LW_delay <= 1'd0;
+  else          result_LW_delay <= result_LW;
+end
+// AUIPC
+ always_ff @(posedge HCLK, negedge HRESETn) begin : golden_rd_AUIPC_regg
+  if (!HRESETn)
+    golden_rd_AUIPC_reg <= 1'b0;
+  else
+    golden_rd_AUIPC_reg <= wb_golden_rd_AUIPC;
+end
+assign golden_SRAI = $signed(wb_rs1_data) >>> wb_insn_shamt;
+assign result_SRAI = core.int_rf.rf[wb_insn_rd_addr_reg];
+assign is_JAL_insn = (wb_insn_opcode == 7'b1101111) & (wb_stall_o_delay != 1'b1) & (core.wb_unit.wb_insn_o.bubble == 1'b0);
+assign is_JAL_insn_PC = (if_insn_opcode == 7'b1101111) & (core.if_unit.if_insn_o.bubble == 1'b0) ;
+assign golden_PC_JAL = core.if_unit.if_pc_o + wb_insn_immJ;
+assign golden_rd_JAL = core.wb_unit.wb_pc_o + 'h4;
+assign result_rd_JAL = core.int_rf.rf[wb_insn_rd_addr_reg];
+assign is_LW_insn = (wb_insn_opcode == 7'b0000011) & (wb_insn_funct3 == 3'b010) & (core.wb_unit.wb_insn_o.bubble == 1'b0) & (wb_stall_o_delay != 1'b1);
+assign golden_LW = wb_rs1_data + wb_I_imm;
+assign result_LW = core.wb_unit.mem_memadr_i; // LW的mem address
+assign is_AUIPC_insn = (wb_insn_opcode == 7'b0010111) & (core.wb_unit.wb_we_o != 'd0) ;//(core.wb_unit.wb_we_o == 1'b1) &//& (id_bubble_2delay == 1'b0);// & (wb_stall_reg != 1'b1) & (core.wb_unit.wb_insn_o.bubble == 1'b0);
+assign if_golden_rd_AUIPC = (core.if_unit.if_pc_o + if_insn_immU); //也將這個值傳到wb stage (用pipeline follower)
+assign result_rd_AUIPC = core.int_rf.rf[wb_insn_rd_addr_reg]; //最後寫回imm的PC
+logic         inst_AUIPC;
+logic [31:0]  golden_AUIPC;
+
+assign inst_AUIPC = (wb_insn_opcode==7'b0010111)&(wb_insn_rd_addr!=5'd0)&(core.wb_we);
+assign golden_AUIPC = wb_pc + wb_U_imm;
+
+
+// BLTU
+logic         is_BLTU_insn;
+logic         BLTU_jump;
+logic         BLTU_no_jump;
+logic [2:0]   BLTU_state;
+logic [31:0]  jump_prediction_success_pc, no_jump_prediction_success_pc, jump_prediction_fail_pc, no_jump_prediction_fail_pc, branch_pc;
+
+assign is_BLTU_insn   = (wb_insn_opcode==7'b1100011)&(wb_insn_funct3==3'b110);
+assign BLTU_jump = (wb_rs1_data < wb_rs2_data);
+assign BLTU_no_jump = ~BLTU_jump;
+
+assign jump_prediction_success_pc = (wb_pc + wb_insn_immB) & 32'hffff_fffc;
+assign no_jump_prediction_success_pc = (wb_pc + 32'd4)         & 32'hffff_fffc;
+assign jump_prediction_fail_pc = (wb_pc + wb_insn_immB) & 32'hffff_fffc;
+assign no_jump_prediction_fail_pc = (wb_pc + 32'd4)         & 32'hffff_fffc;
+
+always_comb
+begin
+	if		(!HRESETn	) 					                    BLTU_state = 3'b000;
+	else if	(is_BLTU_insn && BLTU_jump && wb_branch_prediction)     BLTU_state = 3'b001;
+	else if	(is_BLTU_insn && BLTU_no_jump && !wb_branch_prediction)    BLTU_state = 3'b010;
+	else if	(is_BLTU_insn && BLTU_jump && !wb_branch_prediction)	BLTU_state = 3'b011;
+	else if	(is_BLTU_insn && BLTU_no_jump && wb_branch_prediction)	    BLTU_state = 3'b100;
+    else                                                    BLTU_state = 3'b000;
+end
+
+
+
+logic mem_no_bubble, pd_no_bubble, wb_no_bubble;
+assign mem_no_bubble = !core.mem_unit0.mem_insn_o.bubble;
+assign ex_no_bubble  = !core.ex_units.ex_insn_o.bubble;
+assign pd_no_bubble  = !core.pd_unit.pd_insn_o.bubble;
+
+// BLTU assertion
+ BLTU_jump_prediction_success    : assert property ( @(posedge HCLK) disable iff(~HRESETn) ((is_BLTU_insn && BLTU_state==3'b001 && wb_no_bubble && ex_no_bubble) |-> (jump_prediction_success_pc == core.ex_units.ex_pc_o)));
+ BLTU_no_jump_prediction_success : assert property ( @(posedge HCLK) disable iff(~HRESETn) ((is_BLTU_insn && BLTU_state==3'b010 && wb_no_bubble && mem_no_bubble) |-> (no_jump_prediction_success_pc==core.mem_unit0.mem_pc_o)));
+ BLTU_jump_prediction_fail       : assert property ( @(posedge HCLK) disable iff(~HRESETn) ((is_BLTU_insn && BLTU_state==3'b011 && wb_no_bubble && pd_no_bubble) |-> jump_prediction_fail_pc == core.pd_unit.pd_pc_o));
+ BLTU_no_jump_prediction_fail    : assert property ( @(posedge HCLK) disable iff(~HRESETn) ((is_BLTU_insn && BLTU_state==3'b100 && wb_no_bubble && mem_no_bubble) |-> no_jump_prediction_fail_pc==core.mem_unit0.mem_pc_o));
+
+// SRAI assertion
+ SRAI_check: assert property(@(posedge HCLK) disable iff(!HRESETn) (is_SRAI_insn |=> golden_SRAI_reg == result_SRAI));
+
+// JAL assertion
+  JAL_PC_check: assert property(@(posedge HCLK) disable iff(!HRESETn) (is_JAL_insn_PC |-> golden_PC_JAL == core.if_unit.pd_nxt_pc_i)); 
+  JAL_rd_check: assert property(@(posedge HCLK) disable iff(!HRESETn) (is_JAL_insn |=> golden_rd_JAL_reg == result_rd_JAL)); 
+
+// LW assertion
+  LW_check: assert property(@(posedge HCLK) disable iff(!HRESETn) (is_LW_insn |-> golden_LW == result_LW_delay)); 
+ 
+// AUIPC assertion
+  AUIPC_check: assert property(@(posedge HCLK) disable iff(!HRESETn) (is_AUIPC_insn |=> golden_rd_AUIPC_reg == result_rd_AUIPC)); 
+  
+endmodule
+
+bind riscv_top_ahb3lite ISA formaltest_RV12(  
+	.HRESETn(HRESETn),
+	.HCLK(HCLK));
